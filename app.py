@@ -25,8 +25,9 @@ db = SQLAlchemy()
 jwt = JWTManager()
 mail = Mail()
 migrate = Migrate()
+from extensions import db, jwt, mail, migrate
 
-def create_app(config_name='development'):
+def create_app():
     app = Flask(__name__)
 
     # Core config
@@ -49,6 +50,7 @@ def create_app(config_name='development'):
     app.config['MAIL_DEFAULT_SENDER'] = os.getenv('MAIL_DEFAULT_SENDER')
     app.config['MAX_CONTENT_LENGTH'] = 16 * 1024 * 1024
     app.config['UPLOAD_FOLDER'] = os.path.join(basedir, 'uploads')
+    
 
     # Initialize extensions
     db.init_app(app)
@@ -71,6 +73,8 @@ def create_app(config_name='development'):
     from routes.jobs import jobs_bp
     from routes.messages import messages_bp
     from routes.admin import admin_bp
+    from routes.auth import auth_bp
+    app.register_blueprint(auth_bp)
 
     app.register_blueprint(auth_bp, url_prefix='/api/auth')
     app.register_blueprint(alumni_bp, url_prefix='/api/alumni')
@@ -126,6 +130,7 @@ app = create_app()
 
 if __name__ == '__main__':
     app.run(host='0.0.0.0', port=int(os.environ.get("PORT", 5000)))
+
 
 
 
