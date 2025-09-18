@@ -13,6 +13,7 @@ from werkzeug.security import check_password_hash
 from datetime import datetime
 import re
 
+
 auth_bp = Blueprint('auth', __name__)
 
 def validate_email(email):
@@ -206,4 +207,5 @@ def change_password():
     except Exception as e:
         db.session.rollback()
         return jsonify({'error': str(e)}), 500
+
 
