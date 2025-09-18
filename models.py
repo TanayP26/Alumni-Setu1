@@ -4,10 +4,12 @@ Created on Thu Sep 11 17:00:11 2025
 
 @author: Admin
 """
-from app import db
+from extensions import db
 from datetime import datetime
 from werkzeug.security import generate_password_hash, check_password_hash
 from enum import Enum
+
+
 
 # Enum definitions
 class UserRole(Enum):
@@ -109,6 +111,7 @@ class User(db.Model):
             # Add other sensitive fields if needed, but never include password hash
         
         return data
+    pass
 
 
 class Event(db.Model):
@@ -243,3 +246,4 @@ class NewsletterSubscriber(db.Model):
             'is_active': self.is_active,
             'subscribed_at': self.subscribed_at.isoformat() if self.subscribed_at else None
         }
+
