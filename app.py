@@ -15,6 +15,9 @@ from flask_mail import Mail
 from flask_migrate import Migrate
 from datetime import timedelta
 from dotenv import load_dotenv
+from routes.auth import auth_bp
+from routes.alumni import alumni_bp
+...
 
 load_dotenv()
 
@@ -123,5 +126,6 @@ app = create_app()
 
 if __name__ == '__main__':
     app.run(host='0.0.0.0', port=int(os.environ.get("PORT", 5000)))
+
 
 
