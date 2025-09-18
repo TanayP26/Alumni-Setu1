@@ -1,0 +1,135 @@
+<!DOCTYPE html>
+<html lang="en" class="scroll-smooth">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1"/>
+  <title>Alumni Directory — Alumni Setu</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="preconnect" href="https://fonts.googleapis.com"/>
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Playfair+Display:wght@700&display=swap" rel="stylesheet"/>
+  <script src="https://unpkg.com/lucide@latest"></script>
+  <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}" />
+</head>
+<body class="text-slate-800 bg-slate-50">
+
+  <!-- Header -->
+  <header class="sticky top-0 bg-white/80 backdrop-blur-md z-40 border-b border-slate-200">
+    <nav class="container mx-auto px-4 lg:px-8 py-4 flex justify-between items-center">
+      <a href="/" class="flex items-center space-x-3">
+        <img src="{{ url_for('static', filename='1.png') }}" alt="Logo" width="80" class="rounded-full"/>
+        <span class="font-bold text-2xl text-slate-800 font-display">Alumni Setu</span>
+      </a>
+      <div class="hidden md:flex items-center space-x-6">
+        <a href="/" class="text-slate-600 hover:text-indigo-500 transition">Home</a>
+        <a href="/alumni" class="text-indigo-600 hover:text-indigo-500 transition">Alumni Directory</a>
+        <a href="/jobs" class="text-slate-600 hover:text-indigo-500 transition">Job Board</a>
+        <a href="/events" class="text-slate-600 hover:text-indigo-500 transition">Events</a>
+        <a href="/messaging" class="text-slate-600 hover:text-indigo-500 transition">Messages</a>
+        <a href="/mentorship" class="text-slate-600 hover:text-indigo-500 transition">Mentorship</a>
+      </div>
+    </nav>
+  </header>
+
+  <!-- Main Content -->
+  <main class="container mx-auto px-4 lg:px-8 py-16">
+    <div class="text-center mb-12">
+      <h1 class="text-4xl font-bold text-slate-900">Alumni Directory</h1>
+      <p class="mt-4 text-lg text-slate-600">Connect with your fellow alumni by browsing profiles filtered by graduation year, department, or location.</p>
+    </div>
+
+    <!-- Filters -->
+    <div class="mb-8 grid grid-cols-1 md:grid-cols-4 gap-4">
+      <input id="search-name" type="text" placeholder="Search by name..." class="px-4 py-2 rounded-lg border border-slate-300 focus:outline-none focus:ring-2 focus:ring-indigo-500"/>
+      <select id="filter-year" class="px-4 py-2 rounded-lg border border-slate-300 focus:outline-none focus:ring-2 focus:ring-indigo-500">
+        <option value="">All Years</option>
+        <option>2020</option>
+        <option>2021</option>
+        <option>2022</option>
+        <option>2023</option>
+      </select>
+      <select id="filter-dept" class="px-4 py-2 rounded-lg border border-slate-300 focus:outline-none focus:ring-2 focus:ring-indigo-500">
+        <option value="">All Departments</option>
+        <option>Computer Science</option>
+        <option>Engineering</option>
+        <option>Business</option>
+        <option>Arts</option>
+      </select>
+      <button id="alumni-search-btn" class="px-6 py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 transition">Search</button>
+    </div>
+
+    <!-- Alumni Cards -->
+    <div id="alumni-container" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+      <!-- Example Card -->
+      <div class="bg-white rounded-lg shadow-md border border-slate-200 p-6">
+        <div class="flex items-center mb-4">
+          <img src="{{ url_for('static', filename='2') }}" alt="Alumni" class="w-16 h-16 rounded-full mr-4"/>
+          <div>
+            <h2 class="text-xl font-semibold text-slate-900">Aman Sinha</h2>
+            <p class="text-slate-600">B.Tech CSE ’21</p>
+          </div>
+        </div>
+        <p class="text-slate-600 mb-4">Software Developer at InnovateTech, Bangalore</p>
+        <div class="flex flex-wrap gap-2 mb-4">
+          <span class="px-2 py-1 bg-indigo-100 text-indigo-800 text-xs rounded-full">Python</span>
+          <span class="px-2 py-1 bg-indigo-100 text-indigo-800 text-xs rounded-full">Django</span>
+        </div>
+        <a href="#" class="inline-block px-4 py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 transition">View Profile</a>
+      </div>
+      <!-- Additional sample cards can be loaded via script below -->
+    </div>
+  </main>
+
+  <!-- Footer -->
+  <footer class="bg-slate-900 text-slate-400">
+    <div class="container mx-auto px-4 lg:px-8 py-6 text-center">
+      <p>&copy; 2025 Alumni Setu. All rights reserved.</p>
+    </div>
+  </footer>
+
+  <!-- Alumni Directory Script -->
+  <script>
+    document.getElementById('alumni-search-btn').addEventListener('click', () => {
+      const nameQuery = document.getElementById('search-name').value.trim().toLowerCase();
+      const yearFilter = document.getElementById('filter-year').value;
+      const deptFilter = document.getElementById('filter-dept').value;
+      const container = document.getElementById('alumni-container');
+      container.innerHTML = '';
+
+      // Sample static alumni data; replace with fetch('/api/alumni') as needed
+      const alumni = [
+        { name: 'Aman Sinha', year: '2021', dept: 'Computer Science', position: 'Software Developer', company: 'InnovateTech', location: 'Bangalore', skills: ['Python','Django'] },
+        { name: 'Rahul Mehta', year: '2020', dept: 'Business',          position: 'Business Analyst',  company: 'MarketGenius',  location: 'Mumbai',   skills: ['Excel','Power BI'] },
+        { name: 'Sara Lee',   year: '2022', dept: 'Engineering',       position: 'Project Manager',   company: 'BuildIt Corp',   location: 'Chennai',  skills: ['Agile','Scrum'] },
+        // Add more sample objects
+      ];
+
+      const filtered = alumni.filter(a => 
+        (!nameQuery   || a.name.toLowerCase().includes(nameQuery)) &&
+        (!yearFilter  || a.year === yearFilter) &&
+        (!deptFilter  || a.dept === deptFilter)
+      );
+
+      (filtered.length ? filtered : alumni).forEach(a => {
+        const card = document.createElement('div');
+        card.className = 'bg-white rounded-lg shadow-md border border-slate-200 p-6';
+        card.innerHTML = `
+          <div class="flex items-center mb-4">
+            <img src="/static/profile_placeholder.png" alt="Alumni" class="w-16 h-16 rounded-full mr-4"/>
+            <div>
+              <h2 class="text-xl font-semibold text-slate-900">${a.name}</h2>
+              <p class="text-slate-600">${a.dept} ’${a.year.slice(-2)}</p>
+            </div>
+          </div>
+          <p class="text-slate-600 mb-4">${a.position} at ${a.company}, ${a.location}</p>
+          <div class="flex flex-wrap gap-2 mb-4">
+            ${a.skills.map(skill => `<span class="px-2 py-1 bg-indigo-100 text-indigo-800 text-xs rounded-full">${skill}</span>`).join('')}
+          </div>
+          <a href="#" class="inline-block px-4 py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 transition">View Profile</a>
+        `;
+        container.appendChild(card);
+      });
+    });
+  </script>
+</body>
+</html>

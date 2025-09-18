@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html lang="en" class="scroll-smooth">
+<head>
+    <meta charset="UTF-8"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1"/>
+    <title>{% block title %}Alumni Setu — Your Lifelong Campus Connection{% endblock %}</title>
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com"/>
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Playfair+Display:wght@700&display=swap" rel="stylesheet"/>
+    <!-- Lucide Icons -->
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <!-- Custom Stylesheet -->
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}" />
+</head>
+<body class="text-slate-800 bg-slate-50">
+
+    <!-- Header -->
+    <header class="sticky top-0 bg-white/80 backdrop-blur-md z-40 border-b border-slate-200">
+        <nav class="container mx-auto px-4 lg:px-8 py-4 flex justify-between items-center">
+            <a href="/" class="flex items-center space-x-3">
+                <img src="{{ url_for('static', filename='1.png') }}" alt="Alumni Setu Logo" width="40" class="rounded-full" />
+                <span class="font-bold text-2xl text-slate-800 font-display">Alumni Setu</span>
+            </a>
+            <div class="hidden md:flex items-center space-x-6">
+                <a href="/" class="text-slate-600 hover:text-indigo-500 transition">Home</a>
+                <a href="/alumni" class="text-slate-600 hover:text-indigo-500 transition">Alumni Directory</a>
+                <a href="/jobs" class="text-slate-600 hover:text-indigo-500 transition">Job Board</a>
+                <a href="/events" class="text-slate-600 hover:text-indigo-500 transition">Events</a>
+                <a href="/messaging" class="text-slate-600 hover:text-indigo-500 transition">Messages</a>
+            </div>
+            <div id="auth-buttons" class="flex items-center space-x-2">
+                <button id="login-btn" class="px-5 py-2 text-sm font-semibold rounded-lg text-indigo-500 hover:bg-indigo-50 transition">Login</button>
+                <button id="join-btn" class="px-5 py-2 text-sm font-semibold rounded-lg text-white gradient-bg hover:opacity-90 transition">Join Now</button>
+            </div>
+            <div id="user-profile-section" class="hidden items-center space-x-4">
+                <a href="/profile" class="text-slate-500 hover:text-indigo-500 transition">
+                    <i data-lucide="user"></i>
+                </a>
+                <button id="message-btn" class="text-slate-500 hover:text-indigo-500 transition">
+                    <i data-lucide="message-square"></i>
+                </button>
+                <div class="relative">
+                    <img id="profile-pic" src="{{ url_for('static', filename='profile_placeholder.png') }}" alt="User Profile" class="rounded-full cursor-pointer w-8 h-8" />
+                    <div id="profile-dropdown" class="absolute right-0 mt-2 w-48 bg-white rounded-md shadow-lg py-1 z-50 hidden">
+                        <a href="/profile" class="block px-4 py-2 text-sm text-slate-700 hover:bg-slate-100">My Profile</a>
+                        <a href="#" id="logout-btn" class="block w-full text-left px-4 py-2 text-sm text-slate-700 hover:bg-slate-100">Logout</a>
+                    </div>
+                </div>
+            </div>
+        </nav>
+    </header>
+
+    <!-- Main Content -->
+    <main class="min-h-screen">
+        {% block content %}{% endblock %}
+    </main>
+
+    <!-- Footer -->
+    <footer class="bg-slate-900 text-slate-400">
+        <div class="container mx-auto px-4 lg:px-8 py-12 text-center">
+            <a href="/" class="flex items-center justify-center space-x-3 mb-4">
+                <img src="{{ url_for('static', filename='1.png') }}" alt="Alumni Setu Logo" width="40" class="rounded-full" />
+                <span class="font-bold text-2xl text-white font-display">Alumni Setu</span>
+            </a>
+            <p>&copy; 2025 Alumni Setu. All rights reserved.</p>
+        </div>
+    </footer>
+
+    <!-- Toast Notification -->
+    <div id="toast" class="fixed bottom-5 right-5 bg-slate-900 text-white px-6 py-3 rounded-lg shadow-lg transform translate-y-20 opacity-0 transition-all duration-300">
+        <p id="toast-message">Something happened!</p>
+    </div>
+
+    <!-- Auth Modal (same as index.html) -->
+    {% include 'auth_modal.html' %}
+
+    <!-- Base JavaScript -->
+    <script src="{{ url_for('static', filename='base.js') }}"></script>
+    {% block scripts %}{% endblock %}
+
+</body>
+</html>

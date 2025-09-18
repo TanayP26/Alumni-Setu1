@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html lang="en" class="scroll-smooth">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1"/>
+  <title>Job Board — Alumni Setu</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="preconnect" href="https://fonts.googleapis.com"/>
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Playfair+Display:wght@700&display=swap" rel="stylesheet"/>
+  <script src="https://unpkg.com/lucide@latest"></script>
+  <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}" />
+</head>
+<body class="text-slate-800 bg-slate-50">
+
+  <!-- Header -->
+  <header class="sticky top-0 bg-white/80 backdrop-blur-md z-40 border-b border-slate-200">
+    <nav class="container mx-auto px-4 lg:px-8 py-4 flex justify-between items-center">
+      <a href="/" class="flex items-center space-x-3">
+        <img src="{{ url_for('static', filename='1.png') }}" alt="Logo" width="80" class="rounded-full"/>
+        <span class="font-bold text-2xl text-slate-800 font-display">Alumni Setu</span>
+      </a>
+      <div class="hidden md:flex items-center space-x-6">
+        <a href="/" class="text-slate-600 hover:text-indigo-500 transition">Home</a>
+        <a href="/alumni" class="text-slate-600 hover:text-indigo-500 transition">Alumni Directory</a>
+        <a href="/jobs" class="text-indigo-600 hover:text-indigo-500 transition">Job Board</a>
+        <a href="/events" class="text-slate-600 hover:text-indigo-500 transition">Events</a>
+        <a href="/messaging" class="text-slate-600 hover:text-indigo-500 transition">Messages</a>
+        <a href="/mentorship" class="text-slate-600 hover:text-indigo-500 transition">Mentorship</a>
+      </div>
+    </nav>
+  </header>
+
+  <!-- Main Content -->
+  <main class="container mx-auto px-4 lg:px-8 py-16">
+    <div class="text-center mb-12">
+      <h1 class="text-4xl font-bold text-slate-900">Job Board</h1>
+      <p class="mt-4 text-lg text-slate-600">Explore exclusive job and internship opportunities posted by alumni and partner organizations.</p>
+    </div>
+
+    <!-- Search Bar -->
+    <div class="mb-8">
+      <div class="flex gap-4">
+        <input id="job-search" type="text" placeholder="Search jobs..." class="flex-1 px-4 py-2 rounded-lg border border-slate-300 focus:outline-none focus:ring-2 focus:ring-indigo-500"/>
+        <button id="search-btn" class="px-6 py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 transition">Search</button>
+      </div>
+    </div>
+
+    <!-- Job Listings -->
+    <div id="jobs-container" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+      <!-- Example Job Card -->
+      <div class="bg-white rounded-lg shadow-md border border-slate-200 p-6">
+        <img src="{{ url_for('static', filename='2.png') }}"
+     alt="User Avatar"
+     class="w-16 h-16 rounded-full mr-4"/>
+        <h2 class="text-xl font-semibold text-slate-900 mb-2">Software Engineer Intern</h2>
+        <p class="text-slate-600 mb-1"><span class="font-medium">Company:</span> TechCorp</p>
+        <p class="text-slate-600 mb-1"><span class="font-medium">Location:</span> Remote</p>
+        <p class="text-slate-600 mb-4"><span class="font-medium">Posted:</span> 2 days ago</p>
+        <a href="#" class="inline-block px-4 py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 transition">Apply Now</a>
+      </div>
+      <!-- Add more cards or load dynamically below -->
+    </div>
+  </main>
+
+  <!-- Footer -->
+  <footer class="bg-slate-900 text-slate-400">
+    <div class="container mx-auto px-4 lg:px-8 py-6 text-center">
+      <p>&copy; 2025 Alumni Setu. All rights reserved.</p>
+    </div>
+  </footer>
+
+  <!-- Job Board Script -->
+  <script>
+    document.getElementById('search-btn').addEventListener('click', () => {
+      const query = document.getElementById('job-search').value.trim();
+      const container = document.getElementById('jobs-container');
+      // Clear existing jobs
+      container.innerHTML = '';
+      // Simple static filter example
+      const jobs = [
+        { title: 'Software Engineer Intern', company: 'TechCorp', location: 'Remote', posted: '2 days ago' },
+        { title: 'Product Manager',      company: 'Innova',  location: 'New York, NY', posted: '5 days ago' },
+        { title: 'Data Analyst',         company: 'DataWise',location: 'San Francisco, CA', posted: '1 week ago' },
+        // Add more objects or fetch from API
+      ];
+      const filtered = jobs.filter(job => job.title.toLowerCase().includes(query.toLowerCase()));
+      (filtered.length ? filtered : jobs).forEach(job => {
+        const card = document.createElement('div');
+        card.className = 'bg-white rounded-lg shadow-md border border-slate-200 p-6';
+        card.innerHTML = `
+          <h2 class="text-xl font-semibold text-slate-900 mb-2">${job.title}</h2>
+          <p class="text-slate-600 mb-1"><span class="font-medium">Company:</span> ${job.company}</p>
+          <p class="text-slate-600 mb-1"><span class="font-medium">Location:</span> ${job.location}</p>
+          <p class="text-slate-600 mb-4"><span class="font-medium">Posted:</span> ${job.posted}</p>
+          <a href="#" class="inline-block px-4 py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 transition">Apply Now</a>
+        `;
+        container.appendChild(card);
+      });
+    });
+  </script>
+</body>
+</html>

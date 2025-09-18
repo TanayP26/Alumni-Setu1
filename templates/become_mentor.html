@@ -1,0 +1,179 @@
+<!DOCTYPE html>
+<html lang="en" class="scroll-smooth">
+<head>
+    <meta charset="UTF-8"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1"/>
+    <title>Become a Mentor — Alumni Setu</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com"/>
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Playfair+Display:wght@700&display=swap" rel="stylesheet"/>
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}" />
+</head>
+<body class="text-slate-800">
+
+    <!-- Header -->
+    <header class="sticky top-0 bg-white/80 backdrop-blur-md z-40 border-b border-slate-200">
+        <nav class="container mx-auto px-4 lg:px-8 py-4 flex justify-between items-center">
+            <a href="/" class="flex items-center space-x-3">
+                <img src="{{ url_for('static', filename='1.png') }}" alt="Alumni Setu Logo" width="80" class="rounded-full" />
+                <span class="font-bold text-2xl text-slate-800 font-display">Alumni Setu</span>
+            </a>
+            <div class="hidden md:flex items-center space-x-6">
+                <a href="/" class="text-slate-600 hover:text-indigo-500 transition">Home</a>
+                <a href="/alumni" class="text-slate-600 hover:text-indigo-500 transition">Alumni Directory</a>
+                <a href="/jobs" class="text-slate-600 hover:text-indigo-500 transition">Job Board</a>
+                <a href="/events" class="text-slate-600 hover:text-indigo-500 transition">Events</a>
+                <a href="/messaging" class="text-slate-600 hover:text-indigo-500 transition">Messages</a>
+                <a href="/mentorship" class="text-indigo-600 hover:text-indigo-500 transition">Mentorship</a>
+            </div>
+        </nav>
+    </header>
+
+    <!-- Main Content -->
+    <main class="container mx-auto px-4 lg:px-8 py-16 lg:py-24">
+        <!-- Back Navigation -->
+        <div class="mb-8">
+            <a href="/mentorship" class="inline-flex items-center text-indigo-600 hover:text-indigo-800 transition">
+                <i data-lucide="arrow-left" class="w-4 h-4 mr-2"></i>
+                Back to Mentorship
+            </a>
+        </div>
+
+        <div class="max-w-4xl mx-auto">
+            <div class="text-center mb-12">
+                <h1 class="text-4xl font-bold text-slate-900 mb-6">Become a Mentor</h1>
+                <p class="text-lg text-slate-600">Share your expertise and help shape the next generation of professionals. Join our mentorship program and make a lasting impact.</p>
+            </div>
+
+            <!-- Benefits Section -->
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-12">
+                <div class="text-center">
+                    <div class="w-16 h-16 bg-indigo-100 rounded-full flex items-center justify-center mx-auto mb-4">
+                        <i data-lucide="heart" class="text-indigo-600 w-8 h-8"></i>
+                    </div>
+                    <h3 class="text-xl font-semibold text-slate-900 mb-2">Make an Impact</h3>
+                    <p class="text-slate-600">Guide and inspire the next generation of professionals in your field.</p>
+                </div>
+                <div class="text-center">
+                    <div class="w-16 h-16 bg-emerald-100 rounded-full flex items-center justify-center mx-auto mb-4">
+                        <i data-lucide="users" class="text-emerald-600 w-8 h-8"></i>
+                    </div>
+                    <h3 class="text-xl font-semibold text-slate-900 mb-2">Build Network</h3>
+                    <p class="text-slate-600">Expand your professional network and connect with talented individuals.</p>
+                </div>
+                <div class="text-center">
+                    <div class="w-16 h-16 bg-purple-100 rounded-full flex items-center justify-center mx-auto mb-4">
+                        <i data-lucide="trophy" class="text-purple-600 w-8 h-8"></i>
+                    </div>
+                    <h3 class="text-xl font-semibold text-slate-900 mb-2">Recognition</h3>
+                    <p class="text-slate-600">Gain recognition as a thought leader and expert in your industry.</p>
+                </div>
+            </div>
+
+            <!-- Registration Form -->
+            <div class="bg-white rounded-xl p-8 shadow-lg border border-slate-100">
+                <h2 class="text-2xl font-bold text-slate-900 mb-6">Mentor Registration</h2>
+                <form class="space-y-6">
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                        <div>
+                            <label class="block text-sm font-medium text-slate-700 mb-2">Current Job Title</label>
+                            <input type="text" placeholder="e.g., Senior Software Engineer" class="w-full px-4 py-2 rounded-lg border border-slate-300 focus:outline-none focus:ring-2 focus:ring-indigo-500"/>
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium text-slate-700 mb-2">Company</label>
+                            <input type="text" placeholder="e.g., Google, Microsoft" class="w-full px-4 py-2 rounded-lg border border-slate-300 focus:outline-none focus:ring-2 focus:ring-indigo-500"/>
+                        </div>
+                    </div>
+
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                        <div>
+                            <label class="block text-sm font-medium text-slate-700 mb-2">Years of Experience</label>
+                            <select class="w-full px-4 py-2 rounded-lg border border-slate-300 focus:outline-none focus:ring-2 focus:ring-indigo-500">
+                                <option>Select experience level</option>
+                                <option>3-5 years</option>
+                                <option>5-10 years</option>
+                                <option>10-15 years</option>
+                                <option>15+ years</option>
+                            </select>
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium text-slate-700 mb-2">Industry</label>
+                            <select class="w-full px-4 py-2 rounded-lg border border-slate-300 focus:outline-none focus:ring-2 focus:ring-indigo-500">
+                                <option>Select industry</option>
+                                <option>Technology</option>
+                                <option>Finance</option>
+                                <option>Healthcare</option>
+                                <option>Education</option>
+                                <option>Consulting</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <div>
+                        <label class="block text-sm font-medium text-slate-700 mb-2">Areas of Expertise</label>
+                        <input type="text" placeholder="e.g., Software Development, Data Science, Product Management" class="w-full px-4 py-2 rounded-lg border border-slate-300 focus:outline-none focus:ring-2 focus:ring-indigo-500"/>
+                        <p class="text-sm text-slate-500 mt-1">Separate multiple areas with commas</p>
+                    </div>
+
+                    <div>
+                        <label class="block text-sm font-medium text-slate-700 mb-2">Bio</label>
+                        <textarea rows="4" placeholder="Tell us about your background, achievements, and what you can offer as a mentor..." class="w-full px-4 py-2 rounded-lg border border-slate-300 focus:outline-none focus:ring-2 focus:ring-indigo-500"></textarea>
+                    </div>
+
+                    <div>
+                        <label class="block text-sm font-medium text-slate-700 mb-2">Availability</label>
+                        <select class="w-full px-4 py-2 rounded-lg border border-slate-300 focus:outline-none focus:ring-2 focus:ring-indigo-500">
+                            <option>Select availability</option>
+                            <option>1-2 hours per week</option>
+                            <option>3-5 hours per week</option>
+                            <option>5+ hours per week</option>
+                            <option>As needed</option>
+                        </select>
+                    </div>
+
+                    <div>
+                        <label class="block text-sm font-medium text-slate-700 mb-2">Preferred Communication</label>
+                        <div class="flex flex-wrap gap-4">
+                            <label class="flex items-center">
+                                <input type="checkbox" class="rounded border-slate-300 text-indigo-600 focus:ring-indigo-500"/>
+                                <span class="ml-2 text-sm text-slate-700">Video calls</span>
+                            </label>
+                            <label class="flex items-center">
+                                <input type="checkbox" class="rounded border-slate-300 text-indigo-600 focus:ring-indigo-500"/>
+                                <span class="ml-2 text-sm text-slate-700">Phone calls</span>
+                            </label>
+                            <label class="flex items-center">
+                                <input type="checkbox" class="rounded border-slate-300 text-indigo-600 focus:ring-indigo-500"/>
+                                <span class="ml-2 text-sm text-slate-700">Messages</span>
+                            </label>
+                            <label class="flex items-center">
+                                <input type="checkbox" class="rounded border-slate-300 text-indigo-600 focus:ring-indigo-500"/>
+                                <span class="ml-2 text-sm text-slate-700">In-person meetings</span>
+                            </label>
+                        </div>
+                    </div>
+
+                    <button type="submit" class="w-full px-6 py-3 bg-indigo-600 text-white font-semibold rounded-lg hover:bg-indigo-700 transition">Submit Application</button>
+                </form>
+            </div>
+        </div>
+    </main>
+
+    <!-- Footer -->
+    <footer class="bg-slate-900 text-slate-400">
+        <div class="container mx-auto px-4 lg:px-8 py-12 text-center">
+            <a href="/" class="flex items-center justify-center space-x-3 mb-4">
+                <img src="{{ url_for('static', filename='1.png') }}" alt="Alumni Setu Logo" width="40" class="rounded-full" />
+                <span class="font-bold text-2xl text-white font-display">Alumni Setu</span>
+            </a>
+            <p>&copy; 2025 Alumni Setu. All rights reserved.</p>
+        </div>
+    </footer>
+
+    <script>
+        if (window.lucide) lucide.createIcons();
+    </script>
+</body>
+</html>

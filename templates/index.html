@@ -1,0 +1,203 @@
+<!DOCTYPE html>
+<html lang="en" class="scroll-smooth">
+<head>
+    <meta charset="UTF-8"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1"/>
+    <title>Alumni Setu — Your Lifelong Campus Connection</title>
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com"/>
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Playfair+Display:wght@700&display=swap" rel="stylesheet"/>
+    <!-- Lucide Icons -->
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <!-- Custom Stylesheet -->
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}" />
+</head>
+<body class="text-slate-800">
+
+    <!-- Splash Screen -->
+    <div id="splash-screen" class="fixed inset-0 bg-slate-50 z-50 flex flex-col items-center justify-center transition-opacity duration-1000">
+        <div class="flex items-center space-x-4">
+            <img src="{{ url_for('static', filename='1.png') }}" alt="Alumni Setu Logo" width="200" class="rounded-full" />
+            <h1 class="text-5xl font-bold gradient-text font-display">Alumni Setu</h1>
+        </div>
+        <p class="mt-2 text-slate-500">Your Lifelong Campus Connection</p>
+    </div>
+
+    <!-- Main Content -->
+    <div id="main-content" class="opacity-0 transition-opacity duration-500">
+
+        <!-- Header -->
+        <header class="sticky top-0 bg-white/80 backdrop-blur-md z-40 border-b border-slate-200">
+            <nav class="container mx-auto px-4 lg:px-8 py-4 flex justify-between items-center">
+                <a href="/" class="flex items-center space-x-3">
+                    <img src="{{ url_for('static', filename='1.png') }}" alt="Alumni Setu Logo" width="80" class="rounded-full" />
+                    <span class="font-bold text-2xl text-slate-800 font-display">Alumni Setu</span>
+                </a>
+                <div class="hidden md:flex items-center space-x-6">
+                    <a href="/" class="text-slate-600 hover:text-indigo-500 transition">Home</a>
+                    <a href="/alumni" class="text-slate-600 hover:text-indigo-500 transition">Alumni Directory</a>
+                    <a href="/jobs" class="text-slate-600 hover:text-indigo-500 transition">Job Board</a>
+                    <a href="/events" class="text-slate-600 hover:text-indigo-500 transition">Events</a>
+                    <a href="/messaging" class="text-slate-600 hover:text-indigo-500 transition">Messages</a>
+                </div>
+                <div id="auth-buttons" class="flex items-center space-x-2">
+                    <button id="login-btn" class="px-5 py-2 text-sm font-semibold rounded-lg text-indigo-500 hover:bg-indigo-50 transition">Login</button>
+                    <button id="join-btn" class="px-5 py-2 text-sm font-semibold rounded-lg text-white gradient-bg hover:opacity-90 transition">Join Now</button>
+                </div>
+                <div id="user-profile-section" class="hidden items-center space-x-4">
+                    <a href="/profile" class="text-slate-500 hover:text-indigo-500 transition">
+                        <i data-lucide="user"></i>
+                    </a>
+                    <button id="message-btn" class="text-slate-500 hover:text-indigo-500 transition">
+                        <i data-lucide="message-square"></i>
+                    </button>
+                    <div class="relative">
+                        <img id="profile-pic" src="{{ url_for('static', filename='2.png') }}" alt="User Profile" class="rounded-full cursor-pointer w-8 h-8" />
+                        <div id="profile-dropdown" class="absolute right-0 mt-2 w-48 bg-white rounded-md shadow-lg py-1 z-50 hidden">
+                            <a href="/profile" class="block px-4 py-2 text-sm text-slate-700 hover:bg-slate-100">My Profile</a>
+                            <a href="#" id="logout-btn" class="block w-full text-left px-4 py-2 text-sm text-slate-700 hover:bg-slate-100">Logout</a>
+                        </div>
+                    </div>
+                </div>
+            </nav>
+        </header>
+
+        <!-- Hero Section -->
+        <main class="container mx-auto px-4 lg:px-8 py-16 lg:py-24 text-center">
+            <div class="max-w-4xl mx-auto">
+                <span class="inline-block px-4 py-1.5 mb-4 text-sm font-semibold text-purple-600 bg-purple-100 rounded-full">Your Lifelong Campus Connection</span>
+                <h1 class="text-4xl md:text-6xl font-extrabold text-slate-900 tracking-tight leading-tight">
+                    Connect, Share, and <span class="gradient-text">Grow Together</span>
+                </h1>
+                <p class="mt-6 text-lg text-slate-600 max-w-2xl mx-auto">
+                    Alumni Setu is your exclusive platform to reconnect with classmates, expand your professional network, and stay engaged with your alma mater.
+                </p>
+                <div class="mt-8 flex justify-center gap-4">
+                    <button id="hero-join-btn" class="px-8 py-3 font-semibold rounded-lg text-white gradient-bg hover:opacity-90 transition transform hover:scale-105">
+                        Start Your Journey
+                    </button>
+                    <a href="#features" class="px-8 py-3 font-semibold rounded-lg bg-white border border-slate-300 text-slate-700 hover:bg-slate-50 transition">
+                        Explore Features
+                    </a>
+                </div>
+            </div>
+        </main>
+
+        <!-- Features Section -->
+        <section id="features" class="py-16 lg:py-24 bg-white">
+            <div class="container mx-auto px-4 lg:px-8">
+                <div class="text-center max-w-2xl mx-auto mb-12">
+                    <h2 class="text-3xl md:text-4xl font-bold text-slate-900">A Powerful Platform, Built for You</h2>
+                    <p class="mt-4 text-slate-600">Discover a comprehensive suite of tools designed to foster connection, career growth, and community engagement.</p>
+                </div>
+                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+                    <div class="feature-card" style="opacity:0; animation-delay: 0.1s;">
+                        <div class="icon-container bg-indigo-100"><i data-lucide="users" class="text-indigo-500"></i></div>
+                        <h3 class="text-xl font-bold mb-2">Profile Management</h3>
+                        <p class="text-slate-600">Register and manage your professional and personal profile with ease and security.</p>
+                        <a href="/profile" class="inline-block mt-3 text-indigo-600 hover:text-indigo-800 font-medium">Manage Profile →</a>
+                    </div>
+                    <div class="feature-card" style="opacity:0; animation-delay: 0.2s;">
+                        <div class="icon-container bg-purple-100"><i data-lucide="search" class="text-purple-500"></i></div>
+                        <h3 class="text-xl font-bold mb-2">Alumni Directory</h3>
+                        <p class="text-slate-600">Find classmates and colleagues with an advanced, filterable alumni directory.</p>
+                        <a href="/alumni" class="inline-block mt-3 text-indigo-600 hover:text-indigo-800 font-medium">Browse Directory →</a>
+                    </div>
+                    <div class="feature-card" style="opacity:0; animation-delay: 0.3s;">
+                        <div class="icon-container bg-sky-100"><i data-lucide="calendar-days" class="text-sky-500"></i></div>
+                        <h3 class="text-xl font-bold mb-2">Event Management</h3>
+                        <p class="text-slate-600">Create, manage, and RSVP to virtual and in-person events seamlessly.</p>
+                        <a href="/events" class="inline-block mt-3 text-indigo-600 hover:text-indigo-800 font-medium">View Events →</a>
+                    </div>
+                    <div class="feature-card" style="opacity:0; animation-delay: 0.4s;">
+                        <div class="icon-container bg-emerald-100"><i data-lucide="briefcase" class="text-emerald-500"></i></div>
+                        <h3 id="jobs" class="text-xl font-bold mb-2">Job Board</h3>
+                        <p class="text-slate-600">Access exclusive job and internship postings from the alumni network.</p>
+                        <a href="/jobs" class="inline-block mt-3 text-indigo-600 hover:text-indigo-800 font-medium">Browse Jobs →</a>
+                    </div>
+                    <div class="feature-card" style="opacity:0; animation-delay: 0.5s;">
+                        <div class="icon-container bg-rose-100"><i data-lucide="message-square-text" class="text-rose-500"></i></div>
+                        <h3 class="text-xl font-bold mb-2">Secure Messaging</h3>
+                        <p class="text-slate-600">Communicate securely with fellow alumni, students, and administrators.</p>
+                        <a href="/messaging" class="inline-block mt-3 text-indigo-600 hover:text-indigo-800 font-medium">Open Messages →</a>
+                    </div>
+                    <div class="feature-card" style="opacity:0; animation-delay: 0.6s;">
+                        <div class="icon-container bg-amber-100"><i data-lucide="graduation-cap" class="text-amber-500"></i></div>
+                        <h3 id="mentorship" class="text-xl font-bold mb-2">Mentorship Matching</h3>
+                        <p class="text-slate-600">Connect with students and young alumni for mentorship opportunities.</p>
+                        <a href="/mentorship" class="inline-block mt-3 text-indigo-600 hover:text-indigo-800 font-medium">Find Mentors →</a>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Footer -->
+        <footer class="bg-slate-900 text-slate-400">
+            <div class="container mx-auto px-4 lg:px-8 py-12 text-center">
+                <a href="/" class="flex items-center justify-center space-x-3 mb-4">
+                    <img src="{{ url_for('static', filename='1.png') }}" alt="Alumni Setu Logo" width="40" class="rounded-full" />
+                    <span class="font-bold text-2xl text-white font-display">Alumni Setu</span>
+                </a>
+                <p>&copy; 2025 Alumni Setu. All rights reserved.</p>
+            </div>
+        </footer>
+
+    </div>
+
+    <!-- Auth Modal -->
+    <div id="auth-modal" class="fixed inset-0 bg-black bg-opacity-50 z-50 hidden items-center justify-center p-4">
+        <div id="auth-card" class="bg-white rounded-2xl shadow-2xl w-full max-w-md relative overflow-hidden">
+            <button id="close-modal-btn" class="absolute top-4 right-4 text-slate-400 hover:text-slate-600"><i data-lucide="x" class="w-6 h-6"></i></button>
+            <!-- Login Form -->
+            <div id="login-form-container" class="p-8 md:p-12">
+                <div class="text-center mb-6">
+                    <h2 class="text-2xl font-bold text-slate-900">Welcome Back</h2>
+                    <p class="text-slate-500 mt-1">Sign in to continue your journey.</p>
+                </div>
+                <form id="login-form">
+                    <div class="space-y-4">
+                        <input type="email" name="email" placeholder="Email Address" required class="w-full px-4 py-3 rounded-lg border border-slate-300 focus:outline-none focus:ring-2 focus:ring-indigo-500"/>
+                        <input type="password" name="password" placeholder="Password" required class="w-full px-4 py-3 rounded-lg border border-slate-300 focus:outline-none focus:ring-2 focus:ring-indigo-500"/>
+                    </div>
+                    <button type="submit" class="w-full mt-6 py-3 font-semibold rounded-lg text-white gradient-bg hover:opacity-90 transition">Login</button>
+                </form>
+                <p class="text-center text-sm text-slate-500 mt-6">
+                    Don't have an account? <button id="show-register-btn" class="font-semibold text-indigo-500 hover:underline">Sign up</button>
+                </p>
+            </div>
+            <!-- Register Form -->
+            <div id="register-form-container" class="p-8 md:p-12 hidden">
+                <div class="text-center mb-6">
+                    <h2 class="text-2xl font-bold text-slate-900">Join the Community</h2>
+                    <p class="text-slate-500 mt-1">Create your account to connect.</p>
+                </div>
+                <form id="register-form">
+                    <div class="space-y-3">
+                        <input type="text" name="name" placeholder="Full Name" required class="w-full px-4 py-2.5 rounded-lg border border-slate-300 focus:outline-none focus:ring-2 focus:ring-indigo-500"/>
+                        <input type="email" name="email" placeholder="Email Address" required class="w-full px-4 py-2.5 rounded-lg border border-slate-300 focus:outline-none focus:ring-2 focus:ring-indigo-500"/>
+                        <input type="password" name="password" placeholder="Password (min. 8 chars)" required class="w-full px-4 py-2.5 rounded-lg border border-slate-300 focus:outline-none focus:ring-2 focus:ring-indigo-500"/>
+                        <input type="number" name="graduation_year" placeholder="Graduation Year" required min="1900" max="2100" class="w-full px-4 py-2.5 rounded-lg border border-slate-300 focus:outline-none focus:ring-2 focus:ring-indigo-500"/>
+                        <input type="text" name="course" placeholder="Course (e.g., B.Tech CSE)" required class="w-full px-4 py-2.5 rounded-lg border border-slate-300 focus:outline-none focus:ring-2 focus:ring-indigo-500"/>
+                        <input type="text" name="department" placeholder="Department" required class="w-full px-4 py-2.5 rounded-lg border border-slate-300 focus:outline-none focus:ring-2 focus:ring-indigo-500"/>
+                    </div>
+                    <button type="submit" class="w-full mt-6 py-3 font-semibold rounded-lg text-white gradient-bg hover:opacity-90 transition">Create Account</button>
+                </form>
+                <p class="text-center text-sm text-slate-500 mt-6">
+                    Already have an account? <button id="show-login-btn" class="font-semibold text-indigo-500 hover:underline">Log in</button>
+                </p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Toast Notification -->
+    <div id="toast" class="fixed bottom-5 right-5 bg-slate-900 text-white px-6 py-3 rounded-lg shadow-lg transform translate-y-20 opacity-0 transition-all duration-300">
+        <p id="toast-message">Something happened!</p>
+    </div>
+
+    <!-- Custom JavaScript -->
+    <script src="{{ url_for('static', filename='base.js') }}"></script>
+</body>
+</html>

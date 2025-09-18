@@ -1,0 +1,177 @@
+<!DOCTYPE html>
+<html lang="en" class="scroll-smooth">
+<head>
+    <meta charset="UTF-8"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1"/>
+    <title>Mentorship Matching — Alumni Setu</title>
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com"/>
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Playfair+Display:wght@700&display=swap" rel="stylesheet"/>
+    <!-- Lucide Icons -->
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <!-- Custom Stylesheet -->
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}" />
+</head>
+<body class="text-slate-800">
+
+    <!-- Header -->
+    <header class="sticky top-0 bg-white/80 backdrop-blur-md z-40 border-b border-slate-200">
+        <nav class="container mx-auto px-4 lg:px-8 py-4 flex justify-between items-center">
+            <a href="/" class="flex items-center space-x-3">
+                <img src="{{ url_for('static', filename='1.png') }}" alt="Alumni Setu Logo" width="80" class="rounded-full" />
+                <span class="font-bold text-2xl text-slate-800 font-display">Alumni Setu</span>
+            </a>
+            <div class="hidden md:flex items-center space-x-6">
+                <a href="/" class="text-slate-600 hover:text-indigo-500 transition">Home</a>
+                <a href="/alumni" class="text-slate-600 hover:text-indigo-500 transition">Alumni Directory</a>
+                <a href="/jobs" class="text-slate-600 hover:text-indigo-500 transition">Job Board</a>
+                <a href="/events" class="text-slate-600 hover:text-indigo-500 transition">Events</a>
+                <a href="/messaging" class="text-slate-600 hover:text-indigo-500 transition">Messages</a>
+            </div>
+            <div id="auth-buttons" class="flex items-center space-x-2">
+                <button id="login-btn" class="px-5 py-2 text-sm font-semibold rounded-lg text-indigo-500 hover:bg-indigo-50 transition">Login</button>
+                <button id="join-btn" class="px-5 py-2 text-sm font-semibold rounded-lg text-white gradient-bg hover:opacity-90 transition">Join Now</button>
+            </div>
+            <div id="user-profile-section" class="hidden items-center space-x-4">
+                <a href="/profile" class="text-slate-500 hover:text-indigo-500 transition">
+                    <i data-lucide="user"></i>
+                </a>
+                <button id="message-btn" class="text-slate-500 hover:text-indigo-500 transition">
+                    <i data-lucide="message-square"></i>
+                </button>
+                <div class="relative">
+                    <img id="profile-pic" src="{{ url_for('static', filename='profile_placeholder.png') }}" alt="User Profile" class="rounded-full cursor-pointer w-8 h-8" />
+                    <div id="profile-dropdown" class="absolute right-0 mt-2 w-48 bg-white rounded-md shadow-lg py-1 z-50 hidden">
+                        <a href="/profile" class="block px-4 py-2 text-sm text-slate-700 hover:bg-slate-100">My Profile</a>
+                        <a href="#" id="logout-btn" class="block w-full text-left px-4 py-2 text-sm text-slate-700 hover:bg-slate-100">Logout</a>
+                    </div>
+                </div>
+            </div>
+        </nav>
+    </header>
+
+    <!-- Main Content -->
+    <main class="container mx-auto px-4 lg:px-8 py-16 lg:py-24">
+        <div class="text-center max-w-4xl mx-auto mb-12">
+            <h1 class="text-4xl md:text-5xl font-bold text-slate-900 mb-6">Mentorship Matching</h1>
+            <p class="text-lg text-slate-600">
+                Connect with experienced alumni mentors to guide your career and personal growth, or become a mentor to support the next generation.
+            </p>
+        </div>
+
+        <!-- Mentorship Features -->
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-8 mb-16">
+            <div class="bg-white rounded-xl p-8 shadow-lg border border-slate-100">
+                <div class="w-12 h-12 bg-indigo-100 rounded-lg flex items-center justify-center mb-4">
+                    <i data-lucide="search" class="text-indigo-600 w-6 h-6"></i>
+                </div>
+                <h2 class="text-xl font-semibold text-slate-900 mb-3">Find a Mentor</h2>
+                <p class="text-slate-600 mb-4">Browse available mentors by industry, expertise, and availability to find the perfect match for your career goals.</p>
+                <a href="/mentorship/find-mentor" class="text-indigo-600 hover:text-indigo-800 font-medium">Browse Mentors →</a>
+            </div>
+
+            <div class="bg-white rounded-xl p-8 shadow-lg border border-slate-100">
+                <div class="w-12 h-12 bg-emerald-100 rounded-lg flex items-center justify-center mb-4">
+                    <i data-lucide="user-plus" class="text-emerald-600 w-6 h-6"></i>
+                </div>
+                <h2 class="text-xl font-semibold text-slate-900 mb-3">Become a Mentor</h2>
+                <p class="text-slate-600 mb-4">Share your experience and knowledge by becoming a mentor to support current students and young alumni.</p>
+                <a href="/mentorship/become-mentor" class="text-indigo-600 hover:text-indigo-800 font-medium">Register as Mentor →</a>
+            </div>
+
+            <div class="bg-white rounded-xl p-8 shadow-lg border border-slate-100">
+                <div class="w-12 h-12 bg-amber-100 rounded-lg flex items-center justify-center mb-4">
+                    <i data-lucide="users" class="text-amber-600 w-6 h-6"></i>
+                </div>
+                <h2 class="text-xl font-semibold text-slate-900 mb-3">Your Matches</h2>
+                <p class="text-slate-600 mb-4">View and manage your current mentorship connections, schedule meetings, and track progress.</p>
+                <a href="/mentorship/matches" class="text-indigo-600 hover:text-indigo-800 font-medium">View Matches →</a>
+            </div>
+        </div>
+
+        <!-- Call to Action -->
+        <div class="bg-gradient-to-r from-indigo-500 to-purple-600 rounded-2xl p-8 md:p-12 text-center text-white">
+            <h2 class="text-3xl font-bold mb-4">Ready to Connect?</h2>
+            <p class="text-lg mb-6 opacity-90">Join our mentorship program and accelerate your career growth through meaningful connections.</p>
+            <div class="flex flex-col sm:flex-row gap-4 justify-center">
+                <a href="/mentorship/find-mentor" class="px-8 py-3 bg-white text-indigo-600 font-semibold rounded-lg hover:bg-gray-100 transition">Find a Mentor</a>
+                <a href="/mentorship/become-mentor" class="px-8 py-3 bg-transparent border-2 border-white text-white font-semibold rounded-lg hover:bg-white hover:text-indigo-600 transition">Become a Mentor</a>
+            </div>
+        </div>
+    </main>
+
+    <!-- Footer -->
+    <footer class="bg-slate-900 text-slate-400">
+        <div class="container mx-auto px-4 lg:px-8 py-12 text-center">
+            <a href="/" class="flex items-center justify-center space-x-3 mb-4">
+                <img src="{{ url_for('static', filename='1.png') }}" alt="Alumni Setu Logo" width="40" class="rounded-full" />
+                <span class="font-bold text-2xl text-white font-display">Alumni Setu</span>
+            </a>
+            <p>&copy; 2025 Alumni Setu. All rights reserved.</p>
+        </div>
+    </footer>
+
+    <!-- Auth Modal -->
+    <div id="auth-modal" class="fixed inset-0 bg-black bg-opacity-50 z-50 hidden items-center justify-center p-4">
+        <div id="auth-card" class="bg-white rounded-2xl shadow-2xl w-full max-w-md relative overflow-hidden">
+            <button id="close-modal-btn" class="absolute top-4 right-4 text-slate-400 hover:text-slate-600">
+                <i data-lucide="x" class="w-6 h-6"></i>
+            </button>
+            <!-- Login Form -->
+            <div id="login-form-container" class="p-8 md:p-12">
+                <div class="text-center mb-6">
+                    <h2 class="text-2xl font-bold text-slate-900">Welcome Back</h2>
+                    <p class="text-slate-500 mt-1">Sign in to continue your journey.</p>
+                </div>
+                <form id="login-form">
+                    <div class="space-y-4">
+                        <input type="email" name="email" placeholder="Email Address" required class="w-full px-4 py-3 rounded-lg border border-slate-300 focus:outline-none focus:ring-2 focus:ring-indigo-500"/>
+                        <input type="password" name="password" placeholder="Password" required class="w-full px-4 py-3 rounded-lg border border-slate-300 focus:outline-none focus:ring-2 focus:ring-indigo-500"/>
+                    </div>
+                    <button type="submit" class="w-full mt-6 py-3 font-semibold rounded-lg text-white gradient-bg hover:opacity-90 transition">Login</button>
+                </form>
+                <p class="text-center text-sm text-slate-500 mt-6">
+                    Don't have an account? <button id="show-register-btn" class="font-semibold text-indigo-500 hover:underline">Sign up</button>
+                </p>
+            </div>
+            <!-- Register Form -->
+            <div id="register-form-container" class="p-8 md:p-12 hidden">
+                <div class="text-center mb-6">
+                    <h2 class="text-2xl font-bold text-slate-900">Join the Community</h2>
+                    <p class="text-slate-500 mt-1">Create your account to connect.</p>
+                </div>
+                <form id="register-form">
+                    <div class="space-y-3">
+                        <input type="text" name="name" placeholder="Full Name" required class="w-full px-4 py-2.5 rounded-lg border border-slate-300 focus:outline-none focus:ring-2 focus:ring-indigo-500"/>
+                        <input type="email" name="email" placeholder="Email Address" required class="w-full px-4 py-2.5 rounded-lg border border-slate-300 focus:outline-none focus:ring-2 focus:ring-indigo-500"/>
+                        <input type="password" name="password" placeholder="Password (min. 8 chars)" required class="w-full px-4 py-2.5 rounded-lg border border-slate-300 focus:outline-none focus:ring-2 focus:ring-indigo-500"/>
+                        <input type="number" name="graduation_year" placeholder="Graduation Year" required min="1900" max="2100" class="w-full px-4 py-2.5 rounded-lg border border-slate-300 focus:outline-none focus:ring-2 focus:ring-indigo-500"/>
+                        <input type="text" name="course" placeholder="Course (e.g., B.Tech CSE)" required class="w-full px-4 py-2.5 rounded-lg border border-slate-300 focus:outline-none focus:ring-2 focus:ring-indigo-500"/>
+                        <input type="text" name="department" placeholder="Department" required class="w-full px-4 py-2.5 rounded-lg border border-slate-300 focus:outline-none focus:ring-2 focus:ring-indigo-500"/>
+                    </div>
+                    <button type="submit" class="w-full mt-6 py-3 font-semibold rounded-lg text-white gradient-bg hover:opacity-90 transition">Create Account</button>
+                </form>
+                <p class="text-center text-sm text-slate-500 mt-6">
+                    Already have an account? <button id="show-login-btn" class="font-semibold text-indigo-500 hover:underline">Log in</button>
+                </p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Toast Notification -->
+    <div id="toast" class="fixed bottom-5 right-5 bg-slate-900 text-white px-6 py-3 rounded-lg shadow-lg transform translate-y-20 opacity-0 transition-all duration-300">
+        <p id="toast-message">Something happened!</p>
+    </div>
+
+    <!-- Custom JavaScript -->
+    <script src="{{ url_for('static', filename='base.js') }}"></script>
+
+    <!-- Initialize Lucide Icons -->
+    <script>
+        if (window.lucide) lucide.createIcons();
+    </script>
+</body>
+</html>

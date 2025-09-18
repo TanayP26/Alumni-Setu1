@@ -1,0 +1,385 @@
+<!DOCTYPE html>
+<html lang="en" class="scroll-smooth">
+<head>
+    <meta charset="UTF-8"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1"/>
+    <title>My Profile — Alumni Setu</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com"/>
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Playfair+Display:wght@700&display=swap" rel="stylesheet"/>
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}" />
+</head>
+<body class="text-slate-800 bg-slate-50">
+
+    <!-- Header -->
+    <header class="sticky top-0 bg-white/80 backdrop-blur-md z-40 border-b border-slate-200">
+        <nav class="container mx-auto px-4 lg:px-8 py-4 flex justify-between items-center">
+            <a href="/" class="flex items-center space-x-3">
+                <img src="{{ url_for('static', filename='1.png') }}" alt="Alumni Setu Logo" width="80" class="rounded-full" />
+                <span class="font-bold text-2xl text-slate-800 font-display">Alumni Setu</span>
+            </a>
+            <div class="hidden md:flex items-center space-x-6">
+                <a href="/" class="text-slate-600 hover:text-indigo-500 transition">Home</a>
+                <a href="/alumni" class="text-slate-600 hover:text-indigo-500 transition">Alumni Directory</a>
+                <a href="/jobs" class="text-slate-600 hover:text-indigo-500 transition">Job Board</a>
+                <a href="/events" class="text-slate-600 hover:text-indigo-500 transition">Events</a>
+                <a href="/messaging" class="text-slate-600 hover:text-indigo-500 transition">Messages</a>
+                <a href="/mentorship" class="text-slate-600 hover:text-indigo-500 transition">Mentorship</a>
+            </div>
+            <div id="user-profile-section" class="flex items-center space-x-4">
+                <a href="/profile" class="text-indigo-600 hover:text-indigo-500 transition">
+                    <i data-lucide="user"></i>
+                </a>
+                <button id="message-btn" class="text-slate-500 hover:text-indigo-500 transition">
+                    <i data-lucide="message-square"></i>
+                </button>
+                <div class="relative">
+                    <img id="profile-pic" src="{{ url_for('static', filename='profile_placeholder.png') }}" alt="User Profile" class="rounded-full cursor-pointer w-8 h-8" />
+                    <div id="profile-dropdown" class="absolute right-0 mt-2 w-48 bg-white rounded-md shadow-lg py-1 z-50 hidden">
+                        <a href="/profile" class="block px-4 py-2 text-sm text-slate-700 hover:bg-slate-100">My Profile</a>
+                        <a href="#" id="logout-btn" class="block w-full text-left px-4 py-2 text-sm text-slate-700 hover:bg-slate-100">Logout</a>
+                    </div>
+                </div>
+            </div>
+        </nav>
+    </header>
+
+    <!-- Main Content -->
+    <main class="container mx-auto px-4 lg:px-8 py-16">
+        <div class="max-w-4xl mx-auto">
+            <!-- Profile Header -->
+            <div class="bg-white rounded-xl p-8 shadow-lg border border-slate-100 mb-8">
+                <div class="flex items-center justify-between mb-6">
+                    <h1 class="text-3xl font-bold text-slate-900">My Profile</h1>
+                    <button id="edit-profile-btn" class="px-6 py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 transition">
+                        <i data-lucide="edit-3" class="w-4 h-4 inline mr-2"></i>
+                        Edit Profile
+                    </button>
+                </div>
+
+                <div class="flex items-start space-x-6">
+                    <div class="relative">
+                        <img id="profile-image" src="{{ url_for('static', filename='profile_placeholder.png') }}" alt="Profile Picture" class="w-32 h-32 rounded-full object-cover border-4 border-white shadow-lg"/>
+                        <button id="change-photo-btn" class="absolute bottom-0 right-0 w-10 h-10 bg-indigo-600 text-white rounded-full hover:bg-indigo-700 transition">
+                            <i data-lucide="camera" class="w-4 h-4"></i>
+                        </button>
+                        <input type="file" id="photo-upload" accept="image/*" class="hidden"/>
+                    </div>
+                    <div class="flex-1">
+                        <div id="profile-view">
+                            <h2 id="display-name" class="text-2xl font-bold text-slate-900 mb-2">Loading...</h2>
+                            <p id="display-title" class="text-lg text-slate-600 mb-4">Position at Company</p>
+                            <div class="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm">
+                                <p><span class="font-medium">Email:</span> <span id="display-email">loading@example.com</span></p>
+                                <p><span class="font-medium">Phone:</span> <span id="display-phone">Not provided</span></p>
+                                <p><span class="font-medium">Graduation Year:</span> <span id="display-grad-year">2020</span></p>
+                                <p><span class="font-medium">Department:</span> <span id="display-department">Computer Science</span></p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Profile Edit Form (Hidden by default) -->
+            <div id="profile-edit-form" class="bg-white rounded-xl p-8 shadow-lg border border-slate-100 mb-8 hidden">
+                <div class="flex items-center justify-between mb-6">
+                    <h2 class="text-2xl font-bold text-slate-900">Edit Profile</h2>
+                    <button id="cancel-edit-btn" class="px-4 py-2 text-slate-600 hover:text-slate-800 transition">Cancel</button>
+                </div>
+
+                <form id="update-profile-form">
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                        <div>
+                            <label class="block text-sm font-medium text-slate-700 mb-2">First Name</label>
+                            <input type="text" id="edit-first-name" class="w-full px-4 py-2 rounded-lg border border-slate-300 focus:outline-none focus:ring-2 focus:ring-indigo-500"/>
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium text-slate-700 mb-2">Last Name</label>
+                            <input type="text" id="edit-last-name" class="w-full px-4 py-2 rounded-lg border border-slate-300 focus:outline-none focus:ring-2 focus:ring-indigo-500"/>
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium text-slate-700 mb-2">Phone</label>
+                            <input type="tel" id="edit-phone" class="w-full px-4 py-2 rounded-lg border border-slate-300 focus:outline-none focus:ring-2 focus:ring-indigo-500"/>
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium text-slate-700 mb-2">Current Position</label>
+                            <input type="text" id="edit-position" class="w-full px-4 py-2 rounded-lg border border-slate-300 focus:outline-none focus:ring-2 focus:ring-indigo-500"/>
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium text-slate-700 mb-2">Current Company</label>
+                            <input type="text" id="edit-company" class="w-full px-4 py-2 rounded-lg border border-slate-300 focus:outline-none focus:ring-2 focus:ring-indigo-500"/>
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium text-slate-700 mb-2">Industry</label>
+                            <select id="edit-industry" class="w-full px-4 py-2 rounded-lg border border-slate-300 focus:outline-none focus:ring-2 focus:ring-indigo-500">
+                                <option value="">Select Industry</option>
+                                <option value="technology">Technology</option>
+                                <option value="finance">Finance</option>
+                                <option value="healthcare">Healthcare</option>
+                                <option value="education">Education</option>
+                                <option value="consulting">Consulting</option>
+                                <option value="other">Other</option>
+                            </select>
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium text-slate-700 mb-2">City</label>
+                            <input type="text" id="edit-city" class="w-full px-4 py-2 rounded-lg border border-slate-300 focus:outline-none focus:ring-2 focus:ring-indigo-500"/>
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium text-slate-700 mb-2">LinkedIn URL</label>
+                            <input type="url" id="edit-linkedin" class="w-full px-4 py-2 rounded-lg border border-slate-300 focus:outline-none focus:ring-2 focus:ring-indigo-500"/>
+                        </div>
+                    </div>
+                    
+                    <div class="mt-6">
+                        <label class="block text-sm font-medium text-slate-700 mb-2">Bio</label>
+                        <textarea id="edit-bio" rows="4" class="w-full px-4 py-2 rounded-lg border border-slate-300 focus:outline-none focus:ring-2 focus:ring-indigo-500" placeholder="Tell us about yourself..."></textarea>
+                    </div>
+
+                    <div class="mt-6">
+                        <label class="block text-sm font-medium text-slate-700 mb-2">Skills</label>
+                        <input type="text" id="edit-skills" class="w-full px-4 py-2 rounded-lg border border-slate-300 focus:outline-none focus:ring-2 focus:ring-indigo-500" placeholder="Separate skills with commas"/>
+                    </div>
+
+                    <div class="flex justify-end space-x-4 mt-8">
+                        <button type="button" id="cancel-edit-btn-2" class="px-6 py-2 text-slate-600 border border-slate-300 rounded-lg hover:bg-slate-50 transition">Cancel</button>
+                        <button type="submit" class="px-6 py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 transition">Save Changes</button>
+                    </div>
+                </form>
+            </div>
+
+            <!-- Additional Information -->
+            <div class="bg-white rounded-xl p-8 shadow-lg border border-slate-100">
+                <h3 class="text-xl font-bold text-slate-900 mb-6">Additional Information</h3>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <div>
+                        <h4 class="font-semibold text-slate-900 mb-2">Bio</h4>
+                        <p id="display-bio" class="text-slate-600">No bio provided yet.</p>
+                    </div>
+                    <div>
+                        <h4 class="font-semibold text-slate-900 mb-2">Skills</h4>
+                        <div id="display-skills" class="flex flex-wrap gap-2">
+                            <span class="px-3 py-1 bg-indigo-100 text-indigo-800 text-sm rounded-full">No skills added</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <!-- Toast Notification -->
+    <div id="toast" class="fixed bottom-5 right-5 bg-slate-900 text-white px-6 py-3 rounded-lg shadow-lg transform translate-y-20 opacity-0 transition-all duration-300">
+        <p id="toast-message">Something happened!</p>
+    </div>
+
+    <!-- Profile JavaScript -->
+    <script>
+        let currentUser = null;
+
+        // Toast function
+        function showToast(message, type = 'success') {
+            const toast = document.getElementById('toast');
+            const toastMessage = document.getElementById('toast-message');
+            toastMessage.textContent = message;
+            toast.className = 'fixed bottom-5 right-5 px-6 py-3 rounded-lg shadow-lg transition-opacity duration-300';
+            toast.classList.add(type === 'error' ? 'bg-red-500' : 'bg-green-500', 'show');
+            setTimeout(() => toast.classList.remove('show'), 3000);
+        }
+
+        // Load user profile data
+        async function loadProfile() {
+            const token = localStorage.getItem('token');
+            if (!token) {
+                window.location.href = '/';
+                return;
+            }
+
+            try {
+                const response = await fetch('/api/auth/profile', {
+                    headers: {
+                        'Authorization': `Bearer ${token}`
+                    }
+                });
+
+                if (response.ok) {
+                    const data = await response.json();
+                    currentUser = data.user;
+                    displayProfile(currentUser);
+                } else {
+                    showToast('Failed to load profile', 'error');
+                    localStorage.removeItem('token');
+                    localStorage.removeItem('user');
+                    window.location.href = '/';
+                }
+            } catch (error) {
+                showToast('Network error', 'error');
+            }
+        }
+
+        // Display profile data
+        function displayProfile(user) {
+            document.getElementById('display-name').textContent = `${user.first_name} ${user.last_name}`;
+            document.getElementById('display-title').textContent = user.current_position && user.current_company 
+                ? `${user.current_position} at ${user.current_company}` 
+                : 'Alumni Member';
+            document.getElementById('display-email').textContent = user.email;
+            document.getElementById('display-phone').textContent = user.phone || 'Not provided';
+            document.getElementById('display-grad-year').textContent = user.graduation_year;
+            document.getElementById('display-department').textContent = user.department;
+            document.getElementById('display-bio').textContent = user.bio || 'No bio provided yet.';
+
+            // Display skills
+            const skillsContainer = document.getElementById('display-skills');
+            if (user.skills) {
+                const skills = user.skills.split(',').map(s => s.trim()).filter(s => s);
+                if (skills.length > 0) {
+                    skillsContainer.innerHTML = skills.map(skill => 
+                        `<span class="px-3 py-1 bg-indigo-100 text-indigo-800 text-sm rounded-full">${skill}</span>`
+                    ).join('');
+                }
+            }
+
+            // Update profile image if available
+            if (user.profile_picture) {
+                document.getElementById('profile-image').src = user.profile_picture.startsWith('http') 
+                    ? user.profile_picture 
+                    : `/static/${user.profile_picture}`;
+            }
+        }
+
+        // Populate edit form
+        function populateEditForm(user) {
+            document.getElementById('edit-first-name').value = user.first_name || '';
+            document.getElementById('edit-last-name').value = user.last_name || '';
+            document.getElementById('edit-phone').value = user.phone || '';
+            document.getElementById('edit-position').value = user.current_position || '';
+            document.getElementById('edit-company').value = user.current_company || '';
+            document.getElementById('edit-industry').value = user.industry || '';
+            document.getElementById('edit-city').value = user.city || '';
+            document.getElementById('edit-linkedin').value = user.linkedin_url || '';
+            document.getElementById('edit-bio').value = user.bio || '';
+            document.getElementById('edit-skills').value = user.skills || '';
+        }
+
+        // Update profile
+        async function updateProfile(formData) {
+            const token = localStorage.getItem('token');
+            try {
+                const response = await fetch('/api/auth/profile', {
+                    method: 'PUT',
+                    headers: {
+                        'Authorization': `Bearer ${token}`,
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify(formData)
+                });
+
+                if (response.ok) {
+                    const data = await response.json();
+                    currentUser = data.user;
+                    displayProfile(currentUser);
+                    showEditForm(false);
+                    showToast('Profile updated successfully!');
+                } else {
+                    const error = await response.json();
+                    showToast(error.error || 'Failed to update profile', 'error');
+                }
+            } catch (error) {
+                showToast('Network error', 'error');
+            }
+        }
+
+        // Toggle edit form
+        function showEditForm(show) {
+            const viewElement = document.getElementById('profile-view').parentElement.parentElement;
+            const editElement = document.getElementById('profile-edit-form');
+            
+            if (show) {
+                viewElement.style.display = 'none';
+                editElement.classList.remove('hidden');
+                populateEditForm(currentUser);
+            } else {
+                viewElement.style.display = 'block';
+                editElement.classList.add('hidden');
+            }
+        }
+
+        // Event listeners
+        document.addEventListener('DOMContentLoaded', () => {
+            loadProfile();
+
+            // Edit profile button
+            document.getElementById('edit-profile-btn').addEventListener('click', () => {
+                showEditForm(true);
+            });
+
+            // Cancel edit buttons
+            document.getElementById('cancel-edit-btn').addEventListener('click', () => {
+                showEditForm(false);
+            });
+            document.getElementById('cancel-edit-btn-2').addEventListener('click', () => {
+                showEditForm(false);
+            });
+
+            // Profile form submission
+            document.getElementById('update-profile-form').addEventListener('submit', async (e) => {
+                e.preventDefault();
+                
+                const formData = {
+                    first_name: document.getElementById('edit-first-name').value,
+                    last_name: document.getElementById('edit-last-name').value,
+                    phone: document.getElementById('edit-phone').value,
+                    current_position: document.getElementById('edit-position').value,
+                    current_company: document.getElementById('edit-company').value,
+                    industry: document.getElementById('edit-industry').value,
+                    city: document.getElementById('edit-city').value,
+                    linkedin_url: document.getElementById('edit-linkedin').value,
+                    bio: document.getElementById('edit-bio').value,
+                    skills: document.getElementById('edit-skills').value
+                };
+
+                await updateProfile(formData);
+            });
+
+            // Photo upload
+            document.getElementById('change-photo-btn').addEventListener('click', () => {
+                document.getElementById('photo-upload').click();
+            });
+
+            document.getElementById('photo-upload').addEventListener('change', async (e) => {
+                const file = e.target.files[0];
+                if (file) {
+                    const formData = new FormData();
+                    formData.append('profile_picture', file);
+
+                    const token = localStorage.getItem('token');
+                    try {
+                        const response = await fetch('/api/auth/upload-profile-picture', {
+                            method: 'POST',
+                            headers: {
+                                'Authorization': `Bearer ${token}`
+                            },
+                            body: formData
+                        });
+
+                        if (response.ok) {
+                            const data = await response.json();
+                            document.getElementById('profile-image').src = data.profile_picture_url;
+                            showToast('Profile picture updated!');
+                        } else {
+                            showToast('Failed to upload picture', 'error');
+                        }
+                    } catch (error) {
+                        showToast('Network error', 'error');
+                    }
+                }
+            });
+        });
+
+        // Initialize Lucide icons
+        if (window.lucide) lucide.createIcons();
+    </script>
+</body>
+</html>
