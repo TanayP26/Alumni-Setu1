@@ -5,20 +5,21 @@ Created on Thu Sep 11 17:02:00 2025
 @author: Admin
 """
 
-from extensions import db  # Import db, and other extensions from extensions.py
-from models import User, UserRole  # Import models normally
-from flask import Blueprint, request, jsonify, current_app
+from flask import Blueprint, request, jsonify
 from flask_jwt_extended import create_access_token, jwt_required, get_jwt_identity
 from werkzeug.security import check_password_hash
+from extensions import db
+from models import User, UserRole
 from datetime import datetime
 import re
 
-
 auth_bp = Blueprint('auth', __name__)
+
 
 def validate_email(email):
     pattern = r'^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$'
     return re.match(pattern, email) is not None
+
 
 def validate_password(password):
     # At least 8 characters, one uppercase, one lowercase, one digit
@@ -32,13 +33,15 @@ def validate_password(password):
         return False, "Password must contain at least one number"
     return True, "Valid password"
 
+
 @auth_bp.route('/register', methods=['POST'])
 def register():
     try:
         data = request.get_json()
 
         # Validate required fields
-        required_fields = ['email', 'password', 'first_name', 'last_name', 'graduation_year', 'course', 'department']
+        required_fields = ['email', 'password', 'first_name', 'last_name',
+                           'graduation_year', 'course', 'department']
         for field in required_fields:
             if field not in data or not data[field]:
                 return jsonify({'error': f'{field} is required'}), 400
@@ -78,15 +81,12 @@ def register():
             state=data.get('state'),
             country=data.get('country')
         )
-
         user.set_password(data['password'])
-
         db.session.add(user)
         db.session.commit()
 
-        # Create access token
+        # Create access token with identity as string
         access_token = create_access_token(identity=str(user.id))
-
 
         return jsonify({
             'message': 'User registered successfully',
@@ -97,6 +97,7 @@ def register():
     except Exception as e:
         db.session.rollback()
         return jsonify({'error': str(e)}), 500
+
 
 @auth_bp.route('/login', methods=['POST'])
 def login():
@@ -113,7 +114,8 @@ def login():
             user.last_login = datetime.utcnow()
             db.session.commit()
 
-            access_token = create_access_token(identity=user.id)
+            # Create access token with identity as string
+            access_token = create_access_token(identity=str(user.id))
 
             return jsonify({
                 'message': 'Login successful',
@@ -126,22 +128,20 @@ def login():
     except Exception as e:
         return jsonify({'error': str(e)}), 500
 
+
 @auth_bp.route('/profile', methods=['GET'])
 @jwt_required()
 def get_profile():
     try:
         current_user_id = get_jwt_identity()
         user = User.query.get(current_user_id)
-
         if not user:
             return jsonify({'error': 'User not found'}), 404
-
-        return jsonify({
-            'user': user.to_dict(include_sensitive=True)
-        }), 200
+        return jsonify({'user': user.to_dict(include_sensitive=True)}), 200
 
     except Exception as e:
         return jsonify({'error': str(e)}), 500
+
 
 @auth_bp.route('/profile', methods=['PUT'])
 @jwt_required()
@@ -149,25 +149,21 @@ def update_profile():
     try:
         current_user_id = get_jwt_identity()
         user = User.query.get(current_user_id)
-
         if not user:
             return jsonify({'error': 'User not found'}), 404
 
         data = request.get_json()
-
         # Update allowed fields
         updatable_fields = [
             'first_name', 'last_name', 'phone', 'bio', 'current_company',
             'current_position', 'industry', 'experience_years', 'skills',
             'linkedin_url', 'city', 'state', 'country'
         ]
-
         for field in updatable_fields:
             if field in data:
                 setattr(user, field, data[field])
 
         db.session.commit()
-
         return jsonify({
             'message': 'Profile updated successfully',
             'user': user.to_dict(include_sensitive=True)
@@ -177,18 +173,17 @@ def update_profile():
         db.session.rollback()
         return jsonify({'error': str(e)}), 500
 
+
 @auth_bp.route('/change-password', methods=['POST'])
 @jwt_required()
 def change_password():
     try:
         current_user_id = get_jwt_identity()
         user = User.query.get(current_user_id)
-
         if not user:
             return jsonify({'error': 'User not found'}), 404
 
         data = request.get_json()
-
         if not all(key in data for key in ['current_password', 'new_password']):
             return jsonify({'error': 'Current password and new password are required'}), 400
 
@@ -202,12 +197,8 @@ def change_password():
 
         user.set_password(data['new_password'])
         db.session.commit()
-
         return jsonify({'message': 'Password changed successfully'}), 200
 
     except Exception as e:
         db.session.rollback()
         return jsonify({'error': str(e)}), 500
-
-
-
