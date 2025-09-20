@@ -6,7 +6,7 @@ document.addEventListener('DOMContentLoaded', () => {
   const logoutBtn = document.getElementById('logout-btn');
   const loginBtn = document.getElementById('login-btn');
   const joinBtn = document.getElementById('join-btn');
-  const heroJoinBtn = document.getElementById('hero-join-btn'); // Added Start Your Journey button
+  const heroJoinBtn = document.getElementById('hero-join-btn'); // Start Your Journey button
   const loginForm = document.getElementById('login-form');
   const registerForm = document.getElementById('register-form');
   const loginFormContainer = document.getElementById('login-form-container');
@@ -46,11 +46,20 @@ document.addEventListener('DOMContentLoaded', () => {
     authButtons.classList.add('hidden');
     userProfileSection.classList.remove('hidden');
     userProfileSection.classList.add('flex');
+    
+    // Hide "Start Your Journey" button for logged in users
+    if (heroJoinBtn) {
+      heroJoinBtn.style.display = 'none';
+    }
+    
     if (user.profile_picture) {
       profilePic.src = user.profile_picture.startsWith('http')
         ? user.profile_picture
-        : `/static/2.png`;
+        : `/static/${user.profile_picture}`;
+    } else {
+      profilePic.src = '/static/2.png';
     }
+    
     localStorage.setItem('user', JSON.stringify(user));
     localStorage.setItem('token', user.token);
     closeModal();
@@ -61,6 +70,12 @@ document.addEventListener('DOMContentLoaded', () => {
     userProfileSection.classList.remove('flex');
     userProfileSection.classList.add('hidden');
     authButtons.classList.remove('hidden');
+    
+    // Show "Start Your Journey" button for logged out users
+    if (heroJoinBtn) {
+      heroJoinBtn.style.display = 'block';
+    }
+    
     localStorage.removeItem('user');
     localStorage.removeItem('token');
     showToast('Logged out successfully.');
@@ -189,11 +204,21 @@ document.addEventListener('DOMContentLoaded', () => {
     if (e.target === authModal) closeModal();
   });
 
-  // Hero "Start Your Journey" button functionality
+  // Hero "Start Your Journey" button functionality - Updated to check login status
   heroJoinBtn?.addEventListener('click', () => {
-    loginFormContainer.classList.add('hidden');
-    registerFormContainer.classList.remove('hidden');
-    openModal();
+    // Check if user is already logged in
+    const storedUser = JSON.parse(localStorage.getItem('user') || 'null');
+    const token = localStorage.getItem('token');
+    
+    if (storedUser && token) {
+      // User is logged in, redirect to alumni directory
+      window.location.href = '/alumni';
+    } else {
+      // User is not logged in, show registration modal
+      loginFormContainer.classList.add('hidden');
+      registerFormContainer.classList.remove('hidden');
+      openModal();
+    }
   });
 
   profilePic?.addEventListener('click', () => {
@@ -207,9 +232,17 @@ document.addEventListener('DOMContentLoaded', () => {
 
   window.addEventListener('load', () => {
     setTimeout(() => {
-      splashScreen.style.opacity = '0';
-      mainContent.style.opacity = '1';
-      setTimeout(() => splashScreen.classList.add('hidden'), 1000);
+      if (splashScreen) {
+        splashScreen.style.opacity = '0';
+      }
+      if (mainContent) {
+        mainContent.style.opacity = '1';
+      }
+      setTimeout(() => {
+        if (splashScreen) {
+          splashScreen.classList.add('hidden');
+        }
+      }, 1000);
     }, 1500);
   });
 
