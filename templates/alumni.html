@@ -35,7 +35,7 @@
   <main class="container mx-auto px-4 lg:px-8 py-16">
     <div class="text-center mb-12">
       <h1 class="text-4xl font-bold text-slate-900">Alumni Directory</h1>
-      <p class="mt-4 text-lg text-slate-600">Connect with your fellow alumni by browsing profiles filtered by graduation year, department, or location.</p>
+      <p class="mt-4 text-lg text-slate-600">Connect by browsing profiles filtered by graduation year, department, or location.</p>
     </div>
 
     <!-- Filters -->
@@ -55,17 +55,18 @@
         <option>Business</option>
         <option>Arts</option>
       </select>
+      <input id="filter-location" type="text" placeholder="Location (city, state)" class="px-4 py-2 rounded-lg border border-slate-300 focus:outline-none focus:ring-2 focus:ring-indigo-500"/>
       <button id="alumni-search-btn" class="px-6 py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 transition">Search</button>
     </div>
 
     <!-- Alumni Cards -->
     <div id="alumni-container" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-      <!-- Example Card -->
+      <!-- Sample Card -->
       <div class="bg-white rounded-lg shadow-md border border-slate-200 p-6">
         <div class="flex items-center mb-4">
-          <img src="{{ url_for('static', filename='2') }}" alt="Alumni" class="w-16 h-16 rounded-full mr-4"/>
+          <img src="{{ url_for('static', filename='2.png') }}" alt="Alumni" class="w-16 h-16 rounded-full mr-4"/>
           <div>
-            <h2 class="text-xl font-semibold text-slate-900">Aman Sinha</h2>
+            <h2 class="text-xl font-semibold text-slate-900">Aisha Khan</h2>
             <p class="text-slate-600">B.Tech CSE ’21</p>
           </div>
         </div>
@@ -76,7 +77,7 @@
         </div>
         <a href="#" class="inline-block px-4 py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 transition">View Profile</a>
       </div>
-      <!-- Additional sample cards can be loaded via script below -->
+      <!-- More cards loaded by script -->
     </div>
   </main>
 
@@ -93,21 +94,23 @@
       const nameQuery = document.getElementById('search-name').value.trim().toLowerCase();
       const yearFilter = document.getElementById('filter-year').value;
       const deptFilter = document.getElementById('filter-dept').value;
+      const locationFilter = document.getElementById('filter-location').value.trim().toLowerCase();
       const container = document.getElementById('alumni-container');
       container.innerHTML = '';
 
       // Sample static alumni data; replace with fetch('/api/alumni') as needed
       const alumni = [
-        { name: 'Aman Sinha', year: '2021', dept: 'Computer Science', position: 'Software Developer', company: 'InnovateTech', location: 'Bangalore', skills: ['Python','Django'] },
-        { name: 'Rahul Mehta', year: '2020', dept: 'Business',          position: 'Business Analyst',  company: 'MarketGenius',  location: 'Mumbai',   skills: ['Excel','Power BI'] },
-        { name: 'Sara Lee',   year: '2022', dept: 'Engineering',       position: 'Project Manager',   company: 'BuildIt Corp',   location: 'Chennai',  skills: ['Agile','Scrum'] },
+        { name: 'Aisha Khan', year: '2021', dept: 'Computer Science', position: 'Software Developer', company: 'InnovateTech', location: 'Bangalore', skills: ['Python','Django'] },
+        { name: 'Rahul Mehta', year: '2020', dept: 'Business', position: 'Business Analyst', company: 'MarketGenius', location: 'Mumbai', skills: ['Excel','Power BI'] },
+        { name: 'Sara Lee', year: '2022', dept: 'Engineering', position: 'Project Manager', company: 'BuildIt Corp', location: 'Chennai', skills: ['Agile','Scrum'] },
         // Add more sample objects
       ];
 
-      const filtered = alumni.filter(a => 
-        (!nameQuery   || a.name.toLowerCase().includes(nameQuery)) &&
-        (!yearFilter  || a.year === yearFilter) &&
-        (!deptFilter  || a.dept === deptFilter)
+      const filtered = alumni.filter(a =>
+        (!nameQuery || a.name.toLowerCase().includes(nameQuery)) &&
+        (!yearFilter || a.year === yearFilter) &&
+        (!deptFilter || a.dept === deptFilter) &&
+        (!locationFilter || a.location.toLowerCase().includes(locationFilter))
       );
 
       (filtered.length ? filtered : alumni).forEach(a => {
@@ -115,7 +118,7 @@
         card.className = 'bg-white rounded-lg shadow-md border border-slate-200 p-6';
         card.innerHTML = `
           <div class="flex items-center mb-4">
-            <img src="/static/profile_placeholder.png" alt="Alumni" class="w-16 h-16 rounded-full mr-4"/>
+            <img src="{{ url_for('static', filename='2.png') }}" alt="Alumni" class="w-16 h-16 rounded-full mr-4"/>
             <div>
               <h2 class="text-xl font-semibold text-slate-900">${a.name}</h2>
               <p class="text-slate-600">${a.dept} ’${a.year.slice(-2)}</p>
