@@ -36,7 +36,7 @@
                     <i data-lucide="message-square"></i>
                 </button>
                 <div class="relative">
-                    <img id="profile-pic" src="{{ url_for('static', filename='profile_placeholder.png') }}" alt="User Profile" class="rounded-full cursor-pointer w-8 h-8" />
+                    <img id="profile-pic" src="{{ url_for('static', filename='2.png') }}" alt="User Profile" class="rounded-full cursor-pointer w-8 h-8" />
                     <div id="profile-dropdown" class="absolute right-0 mt-2 w-48 bg-white rounded-md shadow-lg py-1 z-50 hidden">
                         <a href="/profile" class="block px-4 py-2 text-sm text-slate-700 hover:bg-slate-100">My Profile</a>
                         <a href="#" id="logout-btn" class="block w-full text-left px-4 py-2 text-sm text-slate-700 hover:bg-slate-100">Logout</a>
@@ -61,7 +61,7 @@
 
                 <div class="flex items-start space-x-6">
                     <div class="relative">
-                        <img id="profile-image" src="{{ url_for('static', filename='profile_placeholder.png') }}" alt="Profile Picture" class="w-32 h-32 rounded-full object-cover border-4 border-white shadow-lg"/>
+                        <img id="profile-image" src="{{ url_for('static', filename='2.png') }}" alt="Profile Picture" class="w-32 h-32 rounded-full object-cover border-4 border-white shadow-lg"/>
                         <button id="change-photo-btn" class="absolute bottom-0 right-0 w-10 h-10 bg-indigo-600 text-white rounded-full hover:bg-indigo-700 transition">
                             <i data-lucide="camera" class="w-4 h-4"></i>
                         </button>
@@ -161,7 +161,7 @@
                     <div>
                         <h4 class="font-semibold text-slate-900 mb-2">Skills</h4>
                         <div id="display-skills" class="flex flex-wrap gap-2">
-                            <span class="px-3 py-1 bg-indigo-100 text-indigo-800 text-sm rounded-full">No skills added</span>
+                            <span class="px-3 py-1 bg-gray-100 text-gray-600 text-sm rounded-full">No skills added</span>
                         </div>
                     </div>
                 </div>
@@ -183,51 +183,82 @@
             const toast = document.getElementById('toast');
             const toastMessage = document.getElementById('toast-message');
             toastMessage.textContent = message;
-            toast.className = 'fixed bottom-5 right-5 px-6 py-3 rounded-lg shadow-lg transition-opacity duration-300';
-            toast.classList.add(type === 'error' ? 'bg-red-500' : 'bg-green-500', 'show');
-            setTimeout(() => toast.classList.remove('show'), 3000);
+            toast.className = 'fixed bottom-5 right-5 px-6 py-3 rounded-lg shadow-lg transition-all duration-300 show';
+            toast.classList.add(type === 'error' ? 'bg-red-500' : type === 'warning' ? 'bg-yellow-500' : 'bg-green-500');
+            setTimeout(() => {
+                toast.classList.remove('show');
+                toast.classList.remove('bg-red-500', 'bg-yellow-500', 'bg-green-500');
+            }, 3000);
         }
 
         // Load user profile data
         async function loadProfile() {
             const token = localStorage.getItem('token');
-            if (!token) {
+            const storedUser = JSON.parse(localStorage.getItem('user') || 'null');
+            
+            if (!token || !storedUser) {
+                console.log('No token or user found, redirecting to home');
                 window.location.href = '/';
                 return;
             }
 
             try {
                 const response = await fetch('/api/auth/profile', {
+                    method: 'GET',
                     headers: {
-                        'Authorization': `Bearer ${token}`
+                        'Authorization': `Bearer ${token}`,
+                        'Content-Type': 'application/json'
                     }
                 });
 
                 if (response.ok) {
                     const data = await response.json();
-                    currentUser = data.user;
+                    currentUser = data.user || data;
                     displayProfile(currentUser);
-                } else {
-                    showToast('Failed to load profile', 'error');
+                } else if (response.status === 401 || response.status === 422) {
+                    console.log('Token invalid, using stored user data');
                     localStorage.removeItem('token');
                     localStorage.removeItem('user');
-                    window.location.href = '/';
+                    showToast('Session expired. Please login again.', 'error');
+                    setTimeout(() => {
+                        window.location.href = '/';
+                    }, 2000);
+                } else {
+                    console.log('API error, using stored user data');
+                    if (storedUser) {
+                        currentUser = storedUser;
+                        displayProfile(currentUser);
+                    } else {
+                        showToast('Failed to load profile', 'error');
+                    }
                 }
             } catch (error) {
-                showToast('Network error', 'error');
+                console.log('Network error, using stored user data:', error);
+                if (storedUser) {
+                    currentUser = storedUser;
+                    displayProfile(currentUser);
+                    showToast('Using cached profile data (offline mode)', 'warning');
+                } else {
+                    showToast('Network error and no cached data available', 'error');
+                    window.location.href = '/';
+                }
             }
         }
 
         // Display profile data
         function displayProfile(user) {
-            document.getElementById('display-name').textContent = `${user.first_name} ${user.last_name}`;
+            const firstName = user.first_name || user.name?.split(' ')[0] || 'User';
+            const lastName = user.last_name || user.name?.split(' ').slice(1).join(' ') || '';
+            const fullName = `${firstName} ${lastName}`.trim();
+            
+            document.getElementById('display-name').textContent = fullName;
             document.getElementById('display-title').textContent = user.current_position && user.current_company 
                 ? `${user.current_position} at ${user.current_company}` 
                 : 'Alumni Member';
-            document.getElementById('display-email').textContent = user.email;
+            document.getElementById('display-email').textContent = user.email || 'No email';
             document.getElementById('display-phone').textContent = user.phone || 'Not provided';
-            document.getElementById('display-grad-year').textContent = user.graduation_year;
-            document.getElementById('display-department').textContent = user.department;
+            document.getElementById('display-grad-year').textContent = user.graduation_year || 'Not provided';
+            document.getElementById('display-department').textContent = user.department || 'Not provided';
             document.getElementById('display-bio').textContent = user.bio || 'No bio provided yet.';
 
             // Display skills
@@ -238,21 +269,30 @@
                     skillsContainer.innerHTML = skills.map(skill => 
                         `<span class="px-3 py-1 bg-indigo-100 text-indigo-800 text-sm rounded-full">${skill}</span>`
                     ).join('');
+                } else {
+                    skillsContainer.innerHTML = '<span class="px-3 py-1 bg-gray-100 text-gray-600 text-sm rounded-full">No skills added</span>';
                 }
+            } else {
+                skillsContainer.innerHTML = '<span class="px-3 py-1 bg-gray-100 text-gray-600 text-sm rounded-full">No skills added</span>';
             }
 
-            // Update profile image if available
+            const profileImage = document.getElementById('profile-image');
             if (user.profile_picture) {
-                document.getElementById('profile-image').src = user.profile_picture.startsWith('http') 
+                profileImage.src = user.profile_picture.startsWith('http') 
                     ? user.profile_picture 
                     : `/static/${user.profile_picture}`;
+            } else {
+                profileImage.src = '/static/2.png';
             }
         }
 
         // Populate edit form
         function populateEditForm(user) {
-            document.getElementById('edit-first-name').value = user.first_name || '';
-            document.getElementById('edit-last-name').value = user.last_name || '';
+            const firstName = user.first_name || user.name?.split(' ')[0] || '';
+            const lastName = user.last_name || user.name?.split(' ').slice(1).join(' ') || '';
+            
+            document.getElementById('edit-first-name').value = firstName;
+            document.getElementById('edit-last-name').value = lastName;
             document.getElementById('edit-phone').value = user.phone || '';
             document.getElementById('edit-position').value = user.current_position || '';
             document.getElementById('edit-company').value = user.current_company || '';
@@ -266,6 +306,12 @@
         // Update profile
         async function updateProfile(formData) {
             const token = localStorage.getItem('token');
+            if (!token) {
+                showToast('Please login first', 'error');
+                window.location.href = '/';
+                return;
+            }
+            
             try {
                 const response = await fetch('/api/auth/profile', {
                     method: 'PUT',
@@ -278,7 +324,10 @@
 
                 if (response.ok) {
                     const data = await response.json();
-                    currentUser = data.user;
+                    currentUser = { ...currentUser, ...formData };
+                    
+                    localStorage.setItem('user', JSON.stringify(currentUser));
+                    
                     displayProfile(currentUser);
                     showEditForm(false);
                     showToast('Profile updated successfully!');
@@ -287,7 +336,8 @@
                     showToast(error.error || 'Failed to update profile', 'error');
                 }
             } catch (error) {
-                showToast('Network error', 'error');
+                console.error('Update profile error:', error);
+                showToast('Network error. Please try again.', 'error');
             }
         }
 
@@ -311,20 +361,20 @@
             loadProfile();
 
             // Edit profile button
-            document.getElementById('edit-profile-btn').addEventListener('click', () => {
+            document.getElementById('edit-profile-btn')?.addEventListener('click', () => {
                 showEditForm(true);
             });
 
             // Cancel edit buttons
-            document.getElementById('cancel-edit-btn').addEventListener('click', () => {
+            document.getElementById('cancel-edit-btn')?.addEventListener('click', () => {
                 showEditForm(false);
             });
-            document.getElementById('cancel-edit-btn-2').addEventListener('click', () => {
+            document.getElementById('cancel-edit-btn-2')?.addEventListener('click', () => {
                 showEditForm(false);
             });
 
             // Profile form submission
-            document.getElementById('update-profile-form').addEventListener('submit', async (e) => {
+            document.getElementById('update-profile-form')?.addEventListener('submit', async (e) => {
                 e.preventDefault();
                 
                 const formData = {
@@ -344,11 +394,11 @@
             });
 
             // Photo upload
-            document.getElementById('change-photo-btn').addEventListener('click', () => {
+            document.getElementById('change-photo-btn')?.addEventListener('click', () => {
                 document.getElementById('photo-upload').click();
             });
 
-            document.getElementById('photo-upload').addEventListener('change', async (e) => {
+            document.getElementById('photo-upload')?.addEventListener('change', async (e) => {
                 const file = e.target.files[0];
                 if (file) {
                     const formData = new FormData();
@@ -372,8 +422,30 @@
                             showToast('Failed to upload picture', 'error');
                         }
                     } catch (error) {
-                        showToast('Network error', 'error');
+                        showToast('Network error while uploading', 'error');
                     }
+                }
+            });
+
+            // Logout functionality
+            document.getElementById('logout-btn')?.addEventListener('click', (e) => {
+                e.preventDefault();
+                localStorage.removeItem('user');
+                localStorage.removeItem('token');
+                window.location.href = '/';
+            });
+
+            // Profile dropdown toggle
+            document.getElementById('profile-pic')?.addEventListener('click', () => {
+                document.getElementById('profile-dropdown').classList.toggle('hidden');
+            });
+
+            // Close dropdown when clicking outside
+            document.addEventListener('click', (e) => {
+                const dropdown = document.getElementById('profile-dropdown');
+                const profileSection = document.getElementById('user-profile-section');
+                if (dropdown && profileSection && !profileSection.contains(e.target)) {
+                    dropdown.classList.add('hidden');
                 }
             });
         });
