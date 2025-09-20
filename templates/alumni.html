@@ -39,46 +39,32 @@
     </div>
 
     <!-- Filters -->
-    <div class="mb-8 grid grid-cols-1 md:grid-cols-4 gap-4">
-      <input id="search-name" type="text" placeholder="Search by name..." class="px-4 py-2 rounded-lg border border-slate-300 focus:outline-none focus:ring-2 focus:ring-indigo-500"/>
+    <div class="mb-8 grid grid-cols-1 md:grid-cols-5 gap-4">
+      <input id="search-name" type="text" placeholder="Name" class="px-4 py-2 rounded-lg border border-slate-300 focus:outline-none focus:ring-2 focus:ring-indigo-500"/>
       <select id="filter-year" class="px-4 py-2 rounded-lg border border-slate-300 focus:outline-none focus:ring-2 focus:ring-indigo-500">
-        <option value="">All Years</option>
+        <option value="">Year</option>
+        <option>2018</option>
+        <option>2019</option>
         <option>2020</option>
         <option>2021</option>
         <option>2022</option>
         <option>2023</option>
       </select>
       <select id="filter-dept" class="px-4 py-2 rounded-lg border border-slate-300 focus:outline-none focus:ring-2 focus:ring-indigo-500">
-        <option value="">All Departments</option>
+        <option value="">Department</option>
         <option>Computer Science</option>
-        <option>Engineering</option>
         <option>Business</option>
-        <option>Arts</option>
+        <option>Engineering</option>
+        <option>Civil Engineering</option>
+        <option>Electrical Engineering</option>
+        <option>Electronics</option>
       </select>
-      <input id="filter-location" type="text" placeholder="Location (city, state)" class="px-4 py-2 rounded-lg border border-slate-300 focus:outline-none focus:ring-2 focus:ring-indigo-500"/>
+      <input id="filter-location" type="text" placeholder="Location" class="px-4 py-2 rounded-lg border border-slate-300 focus:outline-none focus:ring-2 focus:ring-indigo-500"/>
       <button id="alumni-search-btn" class="px-6 py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 transition">Search</button>
     </div>
 
     <!-- Alumni Cards -->
-    <div id="alumni-container" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-      <!-- Sample Card -->
-      <div class="bg-white rounded-lg shadow-md border border-slate-200 p-6">
-        <div class="flex items-center mb-4">
-          <img src="{{ url_for('static', filename='2.png') }}" alt="Alumni" class="w-16 h-16 rounded-full mr-4"/>
-          <div>
-            <h2 class="text-xl font-semibold text-slate-900">Aisha Khan</h2>
-            <p class="text-slate-600">B.Tech CSE ’21</p>
-          </div>
-        </div>
-        <p class="text-slate-600 mb-4">Software Developer at InnovateTech, Bangalore</p>
-        <div class="flex flex-wrap gap-2 mb-4">
-          <span class="px-2 py-1 bg-indigo-100 text-indigo-800 text-xs rounded-full">Python</span>
-          <span class="px-2 py-1 bg-indigo-100 text-indigo-800 text-xs rounded-full">Django</span>
-        </div>
-        <a href="#" class="inline-block px-4 py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 transition">View Profile</a>
-      </div>
-      <!-- More cards loaded by script -->
-    </div>
+    <div id="alumni-container" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8"></div>
   </main>
 
   <!-- Footer -->
@@ -90,27 +76,40 @@
 
   <!-- Alumni Directory Script -->
   <script>
-    document.getElementById('alumni-search-btn').addEventListener('click', () => {
-      const nameQuery = document.getElementById('search-name').value.trim().toLowerCase();
-      const yearFilter = document.getElementById('filter-year').value;
-      const deptFilter = document.getElementById('filter-dept').value;
-      const locationFilter = document.getElementById('filter-location').value.trim().toLowerCase();
+    document.getElementById('alumni-search-btn').addEventListener('click', renderAlumni);
+    window.addEventListener('DOMContentLoaded', renderAlumni);
+
+    function renderAlumni() {
+      const nameQ = document.getElementById('search-name').value.trim().toLowerCase();
+      const yearF = document.getElementById('filter-year').value;
+      const deptF = document.getElementById('filter-dept').value;
+      const locF = document.getElementById('filter-location').value.trim().toLowerCase();
       const container = document.getElementById('alumni-container');
       container.innerHTML = '';
 
-      // Sample static alumni data; replace with fetch('/api/alumni') as needed
       const alumni = [
-        { name: 'Aisha Khan', year: '2021', dept: 'Computer Science', position: 'Software Developer', company: 'InnovateTech', location: 'Bangalore', skills: ['Python','Django'] },
-        { name: 'Rahul Mehta', year: '2020', dept: 'Business', position: 'Business Analyst', company: 'MarketGenius', location: 'Mumbai', skills: ['Excel','Power BI'] },
-        { name: 'Sara Lee', year: '2022', dept: 'Engineering', position: 'Project Manager', company: 'BuildIt Corp', location: 'Chennai', skills: ['Agile','Scrum'] },
-        // Add more sample objects
+        { name:'Aisha Khan', year:'2021', dept:'Computer Science', position:'Software Developer',  company:'InnovateTech',    location:'Bangalore', skills:['Python','Django'] },
+        { name:'Rahul Mehta', year:'2020', dept:'Business',          position:'Business Analyst', company:'MarketGenius',  location:'Mumbai',    skills:['Excel','Power BI'] },
+        { name:'Sara Lee',   year:'2022', dept:'Engineering',       position:'Project Manager',  company:'BuildIt Corp',   location:'Chennai',   skills:['Agile','Scrum'] },
+        { name:'Vikram Patel',year:'2019', dept:'Mechanical Engineering',position:'R&D Engineer',  company:'AutoMech',       location:'Pune',      skills:['CAD','Thermodynamics'] },
+        { name:'Neha Sharma',year:'2023', dept:'Computer Science',   position:'Frontend Developer',company:'WebWorks',       location:'Hyderabad', skills:['React','Vue.js'] },
+        { name:'Arjun Reddy',year:'2018', dept:'Electrical Engineering',position:'Power Engineer',  company:'GridPower',      location:'Delhi',     skills:['MATLAB','Simulink'] },
+        { name:'Priyanka Das',year:'2021', dept:'Business',         position:'Marketing Manager',company:'BrandRise',      location:'Kolkata',   skills:['SEO','Content'] },
+        { name:'Sanjeev Singh',year:'2022',dept:'Civil Engineering',position:'Structural Eng.',  company:'BuildSafe',      location:'Ahmedabad', skills:['STAAD','AutoCAD'] },
+        { name:'Deepika Nair',year:'2020', dept:'Computer Science', position:'Data Scientist',  company:'DataSense AI',   location:'Bangalore', skills:['Python','ML'] },
+        { name:'Manoj Varma',year:'2019', dept:'Electronics',       position:'Embedded Eng.',   company:'EmbedTech',      location:'Chennai',   skills:['C','ARM'] },
+        { name:'Kavita Joshi',year:'2023', dept:'Business',         position:'Product Manager', company:'Innova',         location:'Mumbai',    skills:['Product','Analytics'] },
+        { name:'Ravi Kumar', year:'2022', dept:'Engineering',       position:'Site Engineer',   company:'InfraWorks',     location:'Delhi',     skills:['Civil','Project'] },
+        { name:'Anjali Rao', year:'2021', dept:'Computer Science',  position:'UI/UX Designer',  company:'DesignPro',      location:'Pune',      skills:['Figma','Sketch'] },
+        { name:'Tarun Goel', year:'2018', dept:'Electrical Engineering',position:'Control Systems',company:'AutoGrid',       location:'Hyderabad', skills:['PLC','SCADA'] },
+        { name:'Meera Kapoor',year:'2020', dept:'Computer Science',  position:'DevOps Engineer',  company:'CloudServe',     location:'Bangalore', skills:['AWS','Docker'] }
       ];
 
       const filtered = alumni.filter(a =>
-        (!nameQuery || a.name.toLowerCase().includes(nameQuery)) &&
-        (!yearFilter || a.year === yearFilter) &&
-        (!deptFilter || a.dept === deptFilter) &&
-        (!locationFilter || a.location.toLowerCase().includes(locationFilter))
+        (!nameQ   || a.name.toLowerCase().includes(nameQ)) &&
+        (!yearF   || a.year === yearF) &&
+        (!deptF   || a.dept === deptF) &&
+        (!locF    || a.location.toLowerCase().includes(locF))
       );
 
       (filtered.length ? filtered : alumni).forEach(a => {
@@ -132,7 +131,7 @@
         `;
         container.appendChild(card);
       });
-    });
+    }
   </script>
 </body>
 </html>
