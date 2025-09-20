@@ -170,7 +170,7 @@
     </main>
 
     <!-- Toast Notification -->
-    <div id="toast" class="fixed bottom-5 right-5 bg-slate-900 text-white px-6 py-3 rounded-lg shadow-lg transform translate-y-20 opacity-0 transition-all duration-300">
+    <div id="toast" class="fixed bottom-5 right-5 bg-slate-900 text-white px-6 py-3 rounded-lg shadow-lg opacity-0 transition-opacity duration-300">
         <p id="toast-message">Something happened!</p>
     </div>
 
@@ -178,12 +178,11 @@
     <script>
         let currentUser = null;
 
-        // Toast function
         function showToast(message, type = 'success') {
             const toast = document.getElementById('toast');
             const toastMessage = document.getElementById('toast-message');
             toastMessage.textContent = message;
-            toast.className = 'fixed bottom-5 right-5 px-6 py-3 rounded-lg shadow-lg transition-all duration-300 show';
+            toast.className = 'fixed bottom-5 right-5 px-6 py-3 rounded-lg shadow-lg transition-opacity duration-300 show';
             toast.classList.add(type === 'error' ? 'bg-red-500' : type === 'warning' ? 'bg-yellow-500' : 'bg-green-500');
             setTimeout(() => {
                 toast.classList.remove('show');
@@ -191,17 +190,28 @@
             }, 3000);
         }
 
-        // Load user profile data
         async function loadProfile() {
             const token = localStorage.getItem('token');
             const storedUser = JSON.parse(localStorage.getItem('user') || 'null');
             
             if (!token || !storedUser) {
-                console.log('No token or user found, redirecting to home');
                 window.location.href = '/';
                 return;
             }
 
+            // Use cached data first
+            currentUser = storedUser;
+            displayProfile(currentUser);
+            console.log('Profile loaded from cache');
+
+            // Refresh in background
+            refreshProfileInBackground();
+        }
+
+        async function refreshProfileInBackground() {
+            const token = localStorage.getItem('token');
+            if (!token) return;
+            
             try {
                 const response = await fetch('/api/auth/profile', {
                     method: 'GET',
@@ -213,39 +223,19 @@
 
                 if (response.ok) {
                     const data = await response.json();
-                    currentUser = data.user || data;
+                    const freshUser = data.user || data;
+                    localStorage.setItem('user', JSON.stringify(freshUser));
+                    currentUser = freshUser;
                     displayProfile(currentUser);
-                } else if (response.status === 401 || response.status === 422) {
-                    console.log('Token invalid, using stored user data');
-                    localStorage.removeItem('token');
-                    localStorage.removeItem('user');
-                    showToast('Session expired. Please login again.', 'error');
-                    setTimeout(() => {
-                        window.location.href = '/';
-                    }, 2000);
+                    console.log('Profile refreshed from server');
                 } else {
-                    console.log('API error, using stored user data');
-                    if (storedUser) {
-                        currentUser = storedUser;
-                        displayProfile(currentUser);
-                    } else {
-                        showToast('Failed to load profile', 'error');
-                    }
+                    console.log('Background refresh failed');
                 }
             } catch (error) {
-                console.log('Network error, using stored user data:', error);
-                if (storedUser) {
-                    currentUser = storedUser;
-                    displayProfile(currentUser);
-                    showToast('Using cached profile data (offline mode)', 'warning');
-                } else {
-                    showToast('Network error and no cached data available', 'error');
-                    window.location.href = '/';
-                }
+                console.log('Background refresh network error');
             }
         }
 
-        // Display profile data
         function displayProfile(user) {
             const firstName = user.first_name || user.name?.split(' ')[0] || 'User';
             const lastName = user.last_name || user.name?.split(' ').slice(1).join(' ') || '';
@@ -261,36 +251,25 @@
             document.getElementById('display-department').textContent = user.department || 'Not provided';
             document.getElementById('display-bio').textContent = user.bio || 'No bio provided yet.';
 
-            // Display skills
             const skillsContainer = document.getElementById('display-skills');
             if (user.skills) {
-                const skills = user.skills.split(',').map(s => s.trim()).filter(s => s);
-                if (skills.length > 0) {
-                    skillsContainer.innerHTML = skills.map(skill => 
-                        `<span class="px-3 py-1 bg-indigo-100 text-indigo-800 text-sm rounded-full">${skill}</span>`
-                    ).join('');
-                } else {
-                    skillsContainer.innerHTML = '<span class="px-3 py-1 bg-gray-100 text-gray-600 text-sm rounded-full">No skills added</span>';
-                }
+                const skills = user.skills.split(',').map(s=>s.trim()).filter(s=>s);
+                skillsContainer.innerHTML = skills.length 
+                    ? skills.map(skill=>`<span class="px-3 py-1 bg-indigo-100 text-indigo-800 text-sm rounded-full">${skill}</span>`).join('')
+                    : '<span class="px-3 py-1 bg-gray-100 text-gray-600 text-sm rounded-full">No skills added</span>';
             } else {
                 skillsContainer.innerHTML = '<span class="px-3 py-1 bg-gray-100 text-gray-600 text-sm rounded-full">No skills added</span>';
             }
 
             const profileImage = document.getElementById('profile-image');
-            if (user.profile_picture) {
-                profileImage.src = user.profile_picture.startsWith('http') 
-                    ? user.profile_picture 
-                    : `/static/${user.profile_picture}`;
-            } else {
-                profileImage.src = '/static/2.png';
-            }
+            profileImage.src = user.profile_picture?.startsWith('http') 
+                ? user.profile_picture 
+                : '/static/2.png';
         }
 
-        // Populate edit form
         function populateEditForm(user) {
             const firstName = user.first_name || user.name?.split(' ')[0] || '';
             const lastName = user.last_name || user.name?.split(' ').slice(1).join(' ') || '';
-            
             document.getElementById('edit-first-name').value = firstName;
             document.getElementById('edit-last-name').value = lastName;
             document.getElementById('edit-phone').value = user.phone || '';
@@ -303,15 +282,12 @@
             document.getElementById('edit-skills').value = user.skills || '';
         }
 
-        // Update profile
         async function updateProfile(formData) {
             const token = localStorage.getItem('token');
             if (!token) {
-                showToast('Please login first', 'error');
                 window.location.href = '/';
                 return;
             }
-            
             try {
                 const response = await fetch('/api/auth/profile', {
                     method: 'PUT',
@@ -321,13 +297,9 @@
                     },
                     body: JSON.stringify(formData)
                 });
-
                 if (response.ok) {
-                    const data = await response.json();
                     currentUser = { ...currentUser, ...formData };
-                    
                     localStorage.setItem('user', JSON.stringify(currentUser));
-                    
                     displayProfile(currentUser);
                     showEditForm(false);
                     showToast('Profile updated successfully!');
@@ -335,49 +307,34 @@
                     const error = await response.json();
                     showToast(error.error || 'Failed to update profile', 'error');
                 }
-            } catch (error) {
-                console.error('Update profile error:', error);
+            } catch {
                 showToast('Network error. Please try again.', 'error');
             }
         }
 
-        // Toggle edit form
         function showEditForm(show) {
-            const viewElement = document.getElementById('profile-view').parentElement.parentElement;
-            const editElement = document.getElementById('profile-edit-form');
-            
+            const viewElem = document.getElementById('profile-view').parentElement.parentElement;
+            const editElem = document.getElementById('profile-edit-form');
             if (show) {
-                viewElement.style.display = 'none';
-                editElement.classList.remove('hidden');
+                viewElem.style.display = 'none';
+                editElem.classList.remove('hidden');
                 populateEditForm(currentUser);
             } else {
-                viewElement.style.display = 'block';
-                editElement.classList.add('hidden');
+                viewElem.style.display = 'block';
+                editElem.classList.add('hidden');
             }
         }
 
-        // Event listeners
         document.addEventListener('DOMContentLoaded', () => {
             loadProfile();
 
-            // Edit profile button
-            document.getElementById('edit-profile-btn')?.addEventListener('click', () => {
-                showEditForm(true);
-            });
+            document.getElementById('edit-profile-btn')?.addEventListener('click', () => showEditForm(true));
+            document.getElementById('cancel-edit-btn')?.addEventListener('click', () => showEditForm(false));
+            document.getElementById('cancel-edit-btn-2')?.addEventListener('click', () => showEditForm(false));
 
-            // Cancel edit buttons
-            document.getElementById('cancel-edit-btn')?.addEventListener('click', () => {
-                showEditForm(false);
-            });
-            document.getElementById('cancel-edit-btn-2')?.addEventListener('click', () => {
-                showEditForm(false);
-            });
-
-            // Profile form submission
-            document.getElementById('update-profile-form')?.addEventListener('submit', async (e) => {
+            document.getElementById('update-profile-form')?.addEventListener('submit', async e => {
                 e.preventDefault();
-                
-                const formData = {
+                await updateProfile({
                     first_name: document.getElementById('edit-first-name').value,
                     last_name: document.getElementById('edit-last-name').value,
                     phone: document.getElementById('edit-phone').value,
@@ -388,69 +345,56 @@
                     linkedin_url: document.getElementById('edit-linkedin').value,
                     bio: document.getElementById('edit-bio').value,
                     skills: document.getElementById('edit-skills').value
-                };
-
-                await updateProfile(formData);
+                });
             });
 
-            // Photo upload
             document.getElementById('change-photo-btn')?.addEventListener('click', () => {
                 document.getElementById('photo-upload').click();
             });
-
-            document.getElementById('photo-upload')?.addEventListener('change', async (e) => {
+            document.getElementById('photo-upload')?.addEventListener('change', async e => {
                 const file = e.target.files[0];
                 if (file) {
-                    const formData = new FormData();
-                    formData.append('profile_picture', file);
-
+                    const data = new FormData();
+                    data.append('profile_picture', file);
                     const token = localStorage.getItem('token');
                     try {
-                        const response = await fetch('/api/auth/upload-profile-picture', {
+                        const res = await fetch('/api/auth/upload-profile-picture', {
                             method: 'POST',
-                            headers: {
-                                'Authorization': `Bearer ${token}`
-                            },
-                            body: formData
+                            headers: { 'Authorization': `Bearer ${token}` },
+                            body: data
                         });
-
-                        if (response.ok) {
-                            const data = await response.json();
-                            document.getElementById('profile-image').src = data.profile_picture_url;
+                        if (res.ok) {
+                            const resp = await res.json();
+                            document.getElementById('profile-image').src = resp.profile_picture_url;
                             showToast('Profile picture updated!');
                         } else {
                             showToast('Failed to upload picture', 'error');
                         }
-                    } catch (error) {
+                    } catch {
                         showToast('Network error while uploading', 'error');
                     }
                 }
             });
 
-            // Logout functionality
-            document.getElementById('logout-btn')?.addEventListener('click', (e) => {
+            document.getElementById('logout-btn')?.addEventListener('click', e => {
                 e.preventDefault();
                 localStorage.removeItem('user');
                 localStorage.removeItem('token');
                 window.location.href = '/';
             });
 
-            // Profile dropdown toggle
             document.getElementById('profile-pic')?.addEventListener('click', () => {
                 document.getElementById('profile-dropdown').classList.toggle('hidden');
             });
-
-            // Close dropdown when clicking outside
-            document.addEventListener('click', (e) => {
+            document.addEventListener('click', e => {
                 const dropdown = document.getElementById('profile-dropdown');
-                const profileSection = document.getElementById('user-profile-section');
-                if (dropdown && profileSection && !profileSection.contains(e.target)) {
+                const section = document.getElementById('user-profile-section');
+                if (dropdown && section && !section.contains(e.target)) {
                     dropdown.classList.add('hidden');
                 }
             });
         });
 
-        // Initialize Lucide icons
         if (window.lucide) lucide.createIcons();
     </script>
 </body>
