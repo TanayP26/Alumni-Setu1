@@ -77,7 +77,6 @@ def create_app():
     app.register_blueprint(alumni_bp, url_prefix='/api/alumni')
     app.register_blueprint(events_bp, url_prefix='/api/events')
     app.register_blueprint(jobs_bp, url_prefix='/api/jobs')
-    app.register_blueprint(messages_bp, url_prefix='/api/messages')
     app.register_blueprint(admin_bp, url_prefix='/api/admin')
     app.register_blueprint(messaging_bp, url_prefix='/api/messaging')
 
@@ -129,4 +128,5 @@ def create_app():
 if __name__ == "__main__":
     # Run with socketio, to enable real-time events
     socketio.run(create_app(), host='0.0.0.0', port=int(os.environ.get("PORT", 5000)))
+
 
