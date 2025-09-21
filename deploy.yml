@@ -1,0 +1,36 @@
+name: Deploy and Migrate
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+    - uses: actions/checkout@v3
+
+    - name: Set up Python
+      uses: actions/setup-python@v4
+      with:
+        python-version: '3.10'
+
+    - name: Install dependencies
+      run: |
+        python -m pip install --upgrade pip
+        pip install -r requirements.txt
+
+    - name: Set environment variables
+      run: |
+        echo DATABASE_URL=${{ secrets.DATABASE_URL }} >> $GITHUB_ENV
+        echo SECRET_KEY=${{ secrets.SECRET_KEY }} >> $GITHUB_ENV
+        echo JWT_SECRET_KEY=${{ secrets.JWT_SECRET_KEY }} >> $GITHUB_ENV
+        # add any other env secrets you need
+
+    - name: Run database migrations
+      run: flask db upgrade
+
+    - name: Start Application
+      run: gunicorn "app:create_app()" --bind 0.0.0.0:5000
