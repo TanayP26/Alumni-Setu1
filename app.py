@@ -17,6 +17,7 @@ from datetime import timedelta
 from dotenv import load_dotenv
 from routes.auth import auth_bp
 from routes.alumni import alumni_bp
+from routes.messaging import messaging_bp
 ...
 
 load_dotenv()
@@ -81,6 +82,7 @@ def create_app():
     app.register_blueprint(jobs_bp, url_prefix='/api/jobs')
     app.register_blueprint(messages_bp, url_prefix='/api/messages')
     app.register_blueprint(admin_bp, url_prefix='/api/admin')
+    app.register_blueprint(messaging_bp, url_prefix='/api/messaging')
 
     # Frontend routes
     @app.route('/')
@@ -124,11 +126,20 @@ def create_app():
     def mentor_matches_page():
         return render_template('mentor_matches.html')
 
+
+    @app.route('/messaging')
+    def messaging():
+        return render_template('messaging.html')
+    
+    
+
+
     return app
 app = create_app()
 
 if __name__ == '__main__':
     app.run(host='0.0.0.0', port=int(os.environ.get("PORT", 5000)))
+
 
 
 
