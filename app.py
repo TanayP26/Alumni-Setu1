@@ -11,6 +11,7 @@ from flask_jwt_extended import JWTManager
 from flask_cors import CORS
 from flask_mail import Mail
 from flask_migrate import Migrate
+from flask_socketio import SocketIO
 from datetime import timedelta
 from dotenv import load_dotenv
 
@@ -21,6 +22,7 @@ db = SQLAlchemy()
 jwt = JWTManager()
 mail = Mail()
 migrate = Migrate()
+socketio = SocketIO()
 
 # Import blueprints
 from routes.auth import auth_bp
@@ -33,14 +35,14 @@ from routes.messaging import messaging_bp
 
 def create_app():
     app = Flask(__name__)
-
-    # Core config
-    app.config['SECRET_KEY'] = os.getenv('SECRET_KEY', 'your-secret-key-here')
     basedir = os.path.abspath(os.path.dirname(__file__))
-    db_url = os.getenv('DATABASE_URL', 'sqlite:///alumni_management.db')
+
+    # Configuration
+    app.config['SECRET_KEY'] = os.getenv('SECRET_KEY', 'your-secret-key-here')
+    db_url = os.getenv('DATABASE_URL', f'sqlite:///{os.path.join(basedir, "alumni_management.db")}')
     if db_url.startswith('sqlite:///'):
-        rel_path = db_url.replace('sqlite:///', '', 1)
-        app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///' + os.path.join(basedir, rel_path)
+        rel = db_url.replace('sqlite:///', '', 1)
+        app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///' + os.path.join(basedir, rel)
     else:
         app.config['SQLALCHEMY_DATABASE_URI'] = db_url
     app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
@@ -60,12 +62,13 @@ def create_app():
     jwt.init_app(app)
     mail.init_app(app)
     migrate.init_app(app, db)
+    socketio.init_app(app, cors_allowed_origins="*")
     CORS(app, resources={r"/api/*": {"origins": "*"}})
 
-    # Ensure upload folder exists
+    # Ensure upload folder
     os.makedirs(app.config['UPLOAD_FOLDER'], exist_ok=True)
 
-    # Create database tables if not exist
+    # Create tables
     with app.app_context():
         db.create_all()
 
@@ -103,7 +106,7 @@ def create_app():
     def profile_page():
         return render_template('profile.html')
 
-    # Mentorship routes
+    # Mentorship
     @app.route('/mentorship')
     def mentorship_page():
         return render_template('mentorship.html')
@@ -125,4 +128,4 @@ def create_app():
 app = create_app()
 
 if __name__ == '__main__':
-    app.run(host='0.0.0.0', port=int(os.environ.get("PORT", 5000)))
+    socketio.run(app, host='0.0.0.0', port=int(os.environ.get("PORT", 5000)))
