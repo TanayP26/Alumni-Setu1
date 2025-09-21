@@ -1,65 +1,438 @@
-{% extends "base.html" %}
+<!DOCTYPE html>
+<html lang="en" class="scroll-smooth">
+<head>
+    <meta charset="UTF-8"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1"/>
+    <title>Messages — Alumni Setu</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com"/>
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Playfair+Display:wght@700&display=swap" rel="stylesheet"/>
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}" />
+</head>
+<body class="text-slate-800 bg-slate-50">
 
-{% block title %}Messages - Alumni Setu{% endblock %}
-
-{% block content %}
-<div class="container mx-auto px-4 lg:px-8 py-8 h-screen">
-    <div class="bg-white rounded-lg shadow-lg h-full flex">
-        <!-- Sidebar - Conversations List -->
-        <div class="w-1/3 border-r border-slate-200 flex flex-col">
-            <div class="p-6 border-b border-slate-200">
-                <h2 class="text-2xl font-bold gradient-text">Messages</h2>
-                <button id="new-message-btn" class="mt-4 w-full bg-indigo-600 text-white px-4 py-2 rounded-lg hover:bg-indigo-700 transition">
-                    <i data-lucide="plus" class="inline w-4 h-4 mr-2"></i>
-                    New Message
+    <!-- Header -->
+    <header class="sticky top-0 bg-white/80 backdrop-blur-md z-40 border-b border-slate-200">
+        <nav class="container mx-auto px-4 lg:px-8 py-4 flex justify-between items-center">
+            <a href="/" class="flex items-center space-x-3">
+                <img src="{{ url_for('static', filename='1.png') }}" alt="Alumni Setu Logo" width="80" class="rounded-full" />
+                <span class="font-bold text-2xl text-slate-800 font-display">Alumni Setu</span>
+            </a>
+            <div class="hidden md:flex items-center space-x-6">
+                <a href="/" class="text-slate-600 hover:text-indigo-500 transition">Home</a>
+                <a href="/alumni" class="text-slate-600 hover:text-indigo-500 transition">Alumni Directory</a>
+                <a href="/jobs" class="text-slate-600 hover:text-indigo-500 transition">Job Board</a>
+                <a href="/events" class="text-slate-600 hover:text-indigo-500 transition">Events</a>
+                <a href="/messaging" class="text-indigo-600 hover:text-indigo-500 transition">Messages</a>
+                <a href="/mentorship" class="text-slate-600 hover:text-indigo-500 transition">Mentorship</a>
+            </div>
+            <div id="user-profile-section" class="flex items-center space-x-4">
+                <a href="/profile" class="text-slate-600 hover:text-indigo-500 transition">
+                    <i data-lucide="user"></i>
+                </a>
+                <button id="message-btn" class="text-indigo-600 hover:text-indigo-500 transition">
+                    <i data-lucide="message-square"></i>
                 </button>
-            </div>
-            <div class="flex-1 overflow-y-auto">
-                <div id="conversations-list">
-                    <!-- Conversations will be loaded here -->
-                </div>
-            </div>
-        </div>
-
-        <!-- Main Chat Area -->
-        <div class="flex-1 flex flex-col">
-            <!-- Chat Header -->
-            <div id="chat-header" class="p-6 border-b border-slate-200 hidden">
-                <div class="flex items-center space-x-4">
-                    <img id="chat-user-avatar" src="" alt="" class="w-10 h-10 rounded-full">
-                    <div>
-                        <h3 id="chat-user-name" class="font-semibold text-slate-900"></h3>
-                        <p id="chat-user-status" class="text-sm text-slate-500"></p>
+                <div class="relative">
+                    <img id="profile-pic" src="{{ url_for('static', filename='2.png') }}" alt="User Profile" class="rounded-full cursor-pointer w-8 h-8" />
+                    <div id="profile-dropdown" class="absolute right-0 mt-2 w-48 bg-white rounded-md shadow-lg py-1 z-50 hidden">
+                        <a href="/profile" class="block px-4 py-2 text-sm text-slate-700 hover:bg-slate-100">My Profile</a>
+                        <a href="#" id="logout-btn" class="block w-full text-left px-4 py-2 text-sm text-slate-700 hover:bg-slate-100">Logout</a>
                     </div>
                 </div>
             </div>
+        </nav>
+    </header>
 
-            <!-- Messages Area -->
-            <div class="flex-1 overflow-y-auto p-6" id="messages-area">
-                <div id="welcome-state" class="text-center py-20">
-                    <i data-lucide="message-circle" class="w-16 h-16 mx-auto text-slate-400 mb-4"></i>
-                    <h3 class="text-xl font-semibold text-slate-600 mb-2">Welcome to Messages</h3>
-                    <p class="text-slate-500">Select a conversation to start messaging</p>
-                </div>
-                <div id="messages-container" class="hidden space-y-4">
-                    <!-- Messages will be loaded here -->
-                </div>
-            </div>
-
-            <!-- Message Input -->
-            <div id="message-input-area" class="p-6 border-t border-slate-200 hidden">
-                <div class="flex space-x-4">
-                    <input type="text" id="message-input" placeholder="Type your message..." class="flex-1 px-4 py-2 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500">
-                    <button id="send-message-btn" class="bg-indigo-600 text-white px-6 py-2 rounded-lg hover:bg-indigo-700 transition">
-                        <i data-lucide="send" class="w-4 h-4"></i>
+    <!-- Main Content -->
+    <main class="container mx-auto px-4 lg:px-8 py-16">
+        <div class="max-w-6xl mx-auto">
+            <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+                
+                <!-- Sidebar -->
+                <div class="lg:col-span-1">
+                    <div class="bg-white rounded-xl p-6 shadow-lg border border-slate-100 mb-6">
+                        <h2 class="text-xl font-bold text-slate-900 mb-4">Messages</h2>
+                        <div class="space-y-2">
+                            <button id="inbox-btn" class="w-full text-left px-4 py-2 bg-indigo-100 text-indigo-800 rounded-lg">
+                                <i data-lucide="inbox" class="w-4 h-4 inline mr-2"></i>
+                                Inbox <span id="unread-count" class="bg-indigo-600 text-white px-2 py-1 text-xs rounded-full ml-2">0</span>
+                            </button>
+                            <button id="sent-btn" class="w-full text-left px-4 py-2 text-slate-600 hover:bg-slate-100 rounded-lg">
+                                <i data-lucide="send" class="w-4 h-4 inline mr-2"></i>
+                                Sent
+                            </button>
+                        </div>
+                    </div>
+                    
+                    <button id="compose-btn" class="w-full px-6 py-3 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 transition">
+                        <i data-lucide="plus" class="w-4 h-4 inline mr-2"></i>
+                        Compose Message
                     </button>
+                </div>
+
+                <!-- Main Content Area -->
+                <div class="lg:col-span-2">
+                    <!-- Message List -->
+                    <div id="message-list" class="bg-white rounded-xl shadow-lg border border-slate-100">
+                        <div class="p-6 border-b border-slate-200">
+                            <h3 id="list-title" class="text-xl font-bold text-slate-900">Inbox</h3>
+                        </div>
+                        <div id="messages-container" class="divide-y divide-slate-200">
+                            <!-- Messages will be loaded here -->
+                        </div>
+                    </div>
+
+                    <!-- Message View -->
+                    <div id="message-view" class="bg-white rounded-xl shadow-lg border border-slate-100 hidden">
+                        <div class="p-6 border-b border-slate-200 flex justify-between items-center">
+                            <button id="back-btn" class="text-slate-600 hover:text-slate-800">
+                                <i data-lucide="arrow-left" class="w-5 h-5"></i>
+                            </button>
+                            <button id="delete-btn" class="text-red-600 hover:text-red-800">
+                                <i data-lucide="trash-2" class="w-5 h-5"></i>
+                            </button>
+                        </div>
+                        <div id="message-content" class="p-6">
+                            <!-- Message content will be loaded here -->
+                        </div>
+                    </div>
                 </div>
             </div>
         </div>
-    </div>
-</div>
-{% endblock %}
+    </main>
 
-{% block scripts %}
-<script src="{{ url_for('static', filename='messaging.js') }}"></script>
-{% endblock %}
+    <!-- Compose Modal -->
+    <div id="compose-modal" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 hidden">
+        <div class="bg-white rounded-xl p-8 w-full max-w-2xl mx-4 max-h-[90vh] overflow-y-auto">
+            <div class="flex justify-between items-center mb-6">
+                <h3 class="text-xl font-bold text-slate-900">Compose Message</h3>
+                <button id="close-compose-btn" class="text-slate-600 hover:text-slate-800">
+                    <i data-lucide="x" class="w-6 h-6"></i>
+                </button>
+            </div>
+            
+            <form id="compose-form">
+                <div class="mb-4">
+                    <label class="block text-sm font-medium text-slate-700 mb-2">To</label>
+                    <select id="recipient-select" class="w-full px-4 py-2 rounded-lg border border-slate-300 focus:outline-none focus:ring-2 focus:ring-indigo-500">
+                        <option value="">Select recipient...</option>
+                    </select>
+                </div>
+                <div class="mb-4">
+                    <label class="block text-sm font-medium text-slate-700 mb-2">Subject</label>
+                    <input type="text" id="message-subject" class="w-full px-4 py-2 rounded-lg border border-slate-300 focus:outline-none focus:ring-2 focus:ring-indigo-500" required>
+                </div>
+                <div class="mb-6">
+                    <label class="block text-sm font-medium text-slate-700 mb-2">Message</label>
+                    <textarea id="message-content-input" rows="6" class="w-full px-4 py-2 rounded-lg border border-slate-300 focus:outline-none focus:ring-2 focus:ring-indigo-500" required></textarea>
+                </div>
+                <div class="flex justify-end space-x-4">
+                    <button type="button" id="cancel-compose-btn" class="px-6 py-2 text-slate-600 border border-slate-300 rounded-lg hover:bg-slate-50 transition">Cancel</button>
+                    <button type="submit" class="px-6 py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 transition">Send Message</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Toast Notification -->
+    <div id="toast" class="fixed bottom-5 right-5 bg-slate-900 text-white px-6 py-3 rounded-lg shadow-lg opacity-0 transition-opacity duration-300">
+        <p id="toast-message">Something happened!</p>
+    </div>
+
+    <!-- Messaging Script -->
+    <script>
+        let currentView = 'inbox';
+        let currentMessageId = null;
+
+        function showToast(message, type = 'success') {
+            const toast = document.getElementById('toast');
+            const toastMessage = document.getElementById('toast-message');
+            toastMessage.textContent = message;
+            toast.className = 'fixed bottom-5 right-5 px-6 py-3 rounded-lg shadow-lg transition-opacity duration-300 show';
+            toast.classList.add(type === 'error' ? 'bg-red-500' : 'bg-green-500');
+            setTimeout(() => {
+                toast.classList.remove('show');
+                toast.classList.remove('bg-red-500', 'bg-green-500');
+            }, 3000);
+        }
+
+        async function loadMessages(view = 'inbox') {
+            const token = localStorage.getItem('token');
+            if (!token) {
+                window.location.href = '/';
+                return;
+            }
+
+            try {
+                const endpoint = view === 'inbox' ? '/api/messaging/inbox' : '/api/messaging/sent';
+                const response = await fetch(endpoint, {
+                    headers: { 'Authorization': `Bearer ${token}` }
+                });
+
+                if (response.ok) {
+                    const data = await response.json();
+                    displayMessages(data.messages, view);
+                } else {
+                    showToast('Failed to load messages', 'error');
+                }
+            } catch (error) {
+                showToast('Network error', 'error');
+            }
+        }
+
+        function displayMessages(messages, view) {
+            const container = document.getElementById('messages-container');
+            const title = document.getElementById('list-title');
+            
+            title.textContent = view === 'inbox' ? 'Inbox' : 'Sent Messages';
+            
+            if (messages.length === 0) {
+                container.innerHTML = '<div class="p-6 text-center text-slate-500">No messages found</div>';
+                return;
+            }
+
+            container.innerHTML = messages.map(msg => `
+                <div class="p-4 hover:bg-slate-50 cursor-pointer message-item ${!msg.is_read && view === 'inbox' ? 'bg-blue-50' : ''}" 
+                     data-message-id="${msg.id}">
+                    <div class="flex justify-between items-start">
+                        <div class="flex-1">
+                            <div class="flex justify-between items-center mb-1">
+                                <span class="font-medium text-slate-900">
+                                    ${view === 'inbox' ? msg.sender_name : msg.recipient_name}
+                                </span>
+                                <span class="text-sm text-slate-500">
+                                    ${new Date(msg.timestamp).toLocaleDateString()}
+                                </span>
+                            </div>
+                            <h4 class="font-medium text-slate-800 mb-1">${msg.subject}</h4>
+                            <p class="text-sm text-slate-600 truncate">${msg.content.substring(0, 100)}...</p>
+                        </div>
+                        ${!msg.is_read && view === 'inbox' ? '<div class="w-3 h-3 bg-indigo-600 rounded-full ml-2"></div>' : ''}
+                    </div>
+                </div>
+            `).join('');
+
+            // Add click listeners
+            document.querySelectorAll('.message-item').forEach(item => {
+                item.addEventListener('click', () => {
+                    const messageId = item.getAttribute('data-message-id');
+                    viewMessage(messageId);
+                });
+            });
+        }
+
+        async function viewMessage(messageId) {
+            const token = localStorage.getItem('token');
+            try {
+                const response = await fetch(`/api/messaging/${messageId}`, {
+                    headers: { 'Authorization': `Bearer ${token}` }
+                });
+
+                if (response.ok) {
+                    const data = await response.json();
+                    displayMessage(data.message);
+                    currentMessageId = messageId;
+                } else {
+                    showToast('Failed to load message', 'error');
+                }
+            } catch (error) {
+                showToast('Network error', 'error');
+            }
+        }
+
+        function displayMessage(message) {
+            const messageList = document.getElementById('message-list');
+            const messageView = document.getElementById('message-view');
+            const messageContent = document.getElementById('message-content');
+
+            messageList.classList.add('hidden');
+            messageView.classList.remove('hidden');
+
+            messageContent.innerHTML = `
+                <div class="mb-4">
+                    <div class="flex justify-between items-center mb-2">
+                        <span class="text-sm text-slate-500">From: ${message.sender_name}</span>
+                        <span class="text-sm text-slate-500">${new Date(message.timestamp).toLocaleString()}</span>
+                    </div>
+                    <h3 class="text-xl font-bold text-slate-900 mb-4">${message.subject}</h3>
+                </div>
+                <div class="prose max-w-none">
+                    <p class="text-slate-700 whitespace-pre-wrap">${message.content}</p>
+                </div>
+            `;
+
+            // Update unread count if this was an unread message
+            if (!message.is_read) {
+                loadUnreadCount();
+                loadMessages(currentView); // Refresh the list
+            }
+        }
+
+        async function loadUnreadCount() {
+            const token = localStorage.getItem('token');
+            try {
+                const response = await fetch('/api/messaging/unread-count', {
+                    headers: { 'Authorization': `Bearer ${token}` }
+                });
+
+                if (response.ok) {
+                    const data = await response.json();
+                    const badge = document.getElementById('unread-count');
+                    badge.textContent = data.unread_count;
+                    badge.style.display = data.unread_count > 0 ? 'inline' : 'none';
+                }
+            } catch (error) {
+                console.error('Failed to load unread count');
+            }
+        }
+
+        async function loadUsers() {
+            const token = localStorage.getItem('token');
+            try {
+                const response = await fetch('/api/alumni', {
+                    headers: { 'Authorization': `Bearer ${token}` }
+                });
+
+                if (response.ok) {
+                    const users = await response.json();
+                    const select = document.getElementById('recipient-select');
+                    select.innerHTML = '<option value="">Select recipient...</option>' +
+                        users.map(user => `<option value="${user.id}">${user.first_name} ${user.last_name}</option>`).join('');
+                }
+            } catch (error) {
+                console.error('Failed to load users');
+            }
+        }
+
+        // Event listeners
+        document.addEventListener('DOMContentLoaded', () => {
+            loadMessages('inbox');
+            loadUnreadCount();
+            loadUsers();
+
+            // Sidebar navigation
+            document.getElementById('inbox-btn').addEventListener('click', () => {
+                currentView = 'inbox';
+                loadMessages('inbox');
+                document.getElementById('inbox-btn').classList.add('bg-indigo-100', 'text-indigo-800');
+                document.getElementById('sent-btn').classList.remove('bg-indigo-100', 'text-indigo-800');
+                document.getElementById('sent-btn').classList.add('text-slate-600', 'hover:bg-slate-100');
+            });
+
+            document.getElementById('sent-btn').addEventListener('click', () => {
+                currentView = 'sent';
+                loadMessages('sent');
+                document.getElementById('sent-btn').classList.add('bg-indigo-100', 'text-indigo-800');
+                document.getElementById('inbox-btn').classList.remove('bg-indigo-100', 'text-indigo-800');
+                document.getElementById('inbox-btn').classList.add('text-slate-600', 'hover:bg-slate-100');
+            });
+
+            // Back button
+            document.getElementById('back-btn').addEventListener('click', () => {
+                document.getElementById('message-view').classList.add('hidden');
+                document.getElementById('message-list').classList.remove('hidden');
+                currentMessageId = null;
+            });
+
+            // Delete button
+            document.getElementById('delete-btn').addEventListener('click', async () => {
+                if (!currentMessageId) return;
+                
+                const token = localStorage.getItem('token');
+                try {
+                    const response = await fetch(`/api/messaging/${currentMessageId}`, {
+                        method: 'DELETE',
+                        headers: { 'Authorization': `Bearer ${token}` }
+                    });
+
+                    if (response.ok) {
+                        showToast('Message deleted successfully');
+                        document.getElementById('back-btn').click();
+                        loadMessages(currentView);
+                        loadUnreadCount();
+                    } else {
+                        showToast('Failed to delete message', 'error');
+                    }
+                } catch (error) {
+                    showToast('Network error', 'error');
+                }
+            });
+
+            // Compose modal
+            document.getElementById('compose-btn').addEventListener('click', () => {
+                document.getElementById('compose-modal').classList.remove('hidden');
+            });
+
+            document.getElementById('close-compose-btn').addEventListener('click', () => {
+                document.getElementById('compose-modal').classList.add('hidden');
+                document.getElementById('compose-form').reset();
+            });
+
+            document.getElementById('cancel-compose-btn').addEventListener('click', () => {
+                document.getElementById('compose-modal').classList.add('hidden');
+                document.getElementById('compose-form').reset();
+            });
+
+            // Send message
+            document.getElementById('compose-form').addEventListener('submit', async (e) => {
+                e.preventDefault();
+                
+                const token = localStorage.getItem('token');
+                const formData = {
+                    recipient_id: document.getElementById('recipient-select').value,
+                    subject: document.getElementById('message-subject').value,
+                    content: document.getElementById('message-content-input').value
+                };
+
+                if (!formData.recipient_id) {
+                    showToast('Please select a recipient', 'error');
+                    return;
+                }
+
+                try {
+                    const response = await fetch('/api/messaging/send', {
+                        method: 'POST',
+                        headers: {
+                            'Authorization': `Bearer ${token}`,
+                            'Content-Type': 'application/json'
+                        },
+                        body: JSON.stringify(formData)
+                    });
+
+                    if (response.ok) {
+                        showToast('Message sent successfully');
+                        document.getElementById('compose-modal').classList.add('hidden');
+                        document.getElementById('compose-form').reset();
+                        if (currentView === 'sent') {
+                            loadMessages('sent');
+                        }
+                    } else {
+                        const error = await response.json();
+                        showToast(error.error || 'Failed to send message', 'error');
+                    }
+                } catch (error) {
+                    showToast('Network error', 'error');
+                }
+            });
+
+            // Profile dropdown
+            document.getElementById('profile-pic')?.addEventListener('click', () => {
+                document.getElementById('profile-dropdown').classList.toggle('hidden');
+            });
+
+            // Logout
+            document.getElementById('logout-btn')?.addEventListener('click', (e) => {
+                e.preventDefault();
+                localStorage.removeItem('user');
+                localStorage.removeItem('token');
+                window.location.href = '/';
+            });
+        });
+
+        if (window.lucide) lucide.createIcons();
+    </script>
+</body>
+</html>
