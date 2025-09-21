@@ -1,18 +1,19 @@
 # -*- coding: utf-8 -*-
 """
 Created on Thu Sep 11 17:02:00 2025
-
 @author: Admin
 """
-
 from flask import Blueprint, request, jsonify
-from flask_jwt_extended import create_access_token, jwt_required, get_jwt_identity
+from flask_jwt_extended import (
+    create_access_token,
+    jwt_required,
+    get_jwt_identity
+)
 from werkzeug.security import generate_password_hash, check_password_hash
 from extensions import db
 from models import User, UserRole
 from datetime import datetime
-import re
-import hashlib
+import re, hashlib
 
 auth_bp = Blueprint('auth', __name__)
 
@@ -23,7 +24,6 @@ def validate_email(email):
 
 
 def validate_password(password):
-    # At least 8 characters, one uppercase, one lowercase, one digit
     if len(password) < 8:
         return False, "Password must be at least 8 characters long"
     if not re.search(r'[A-Z]', password):
@@ -36,30 +36,17 @@ def validate_password(password):
 
 
 def check_legacy_password(stored_hash, password):
-    """Check if password matches legacy format and return True if it does"""
     try:
-        # Try common legacy formats
-        
-        # 1. Plain text (very insecure, but might exist)
         if stored_hash == password:
             return True
-            
-        # 2. MD5 hash
         if stored_hash == hashlib.md5(password.encode()).hexdigest():
             return True
-            
-        # 3. SHA1 hash  
         if stored_hash == hashlib.sha1(password.encode()).hexdigest():
             return True
-            
-        # 4. SHA256 hash
         if stored_hash == hashlib.sha256(password.encode()).hexdigest():
             return True
-            
-        # Add other legacy formats as needed
         return False
-        
-    except Exception:
+    except:
         return False
 
 
@@ -67,28 +54,24 @@ def check_legacy_password(stored_hash, password):
 def register():
     try:
         data = request.get_json()
-
-        # Validate required fields
-        required_fields = ['email', 'password', 'first_name', 'last_name',
-                           'graduation_year', 'course', 'department']
+        required_fields = [
+            'email', 'password', 'first_name', 'last_name',
+            'graduation_year', 'course', 'department'
+        ]
         for field in required_fields:
-            if field not in data or not data[field]:
+            if not data.get(field):
                 return jsonify({'error': f'{field} is required'}), 400
 
-        # Validate email
         if not validate_email(data['email']):
             return jsonify({'error': 'Invalid email format'}), 400
 
-        # Check if user already exists
         if User.query.filter_by(email=data['email'].lower()).first():
             return jsonify({'error': 'Email already registered'}), 400
 
-        # Validate password
-        is_valid, message = validate_password(data['password'])
+        is_valid, msg = validate_password(data['password'])
         if not is_valid:
-            return jsonify({'error': message}), 400
+            return jsonify({'error': msg}), 400
 
-        # Create new user
         user = User(
             email=data['email'].lower(),
             first_name=data['first_name'],
@@ -114,9 +97,7 @@ def register():
         db.session.add(user)
         db.session.commit()
 
-        # Create access token with identity as string
         access_token = create_access_token(identity=str(user.id))
-
         return jsonify({
             'message': 'User registered successfully',
             'access_token': access_token,
@@ -132,64 +113,61 @@ def register():
 def login():
     try:
         data = request.get_json()
-
         if not data.get('email') or not data.get('password'):
             return jsonify({'error': 'Email and password are required'}), 400
 
         user = User.query.filter_by(email=data['email'].lower()).first()
-
         if not user or not user.is_active:
             return jsonify({'error': 'Invalid credentials'}), 401
 
-        # Check password with legacy support
         password_valid = False
-        needs_hash_update = False
+        needs_update = False
 
-        # Try modern Werkzeug format first
         if user.password_hash and check_password_hash(user.password_hash, data['password']):
             password_valid = True
-        
-        # If modern format fails, try legacy formats
         elif user.password_hash and check_legacy_password(user.password_hash, data['password']):
             password_valid = True
-            needs_hash_update = True
+            needs_update = True
 
-        if password_valid:
-            # Update to modern hash format if using legacy
-            if needs_hash_update:
-                user.password_hash = generate_password_hash(data['password'])
-                print(f"Updated legacy password for user {user.email}")
-
-            # Update last login
-            user.last_login = datetime.utcnow()
-            db.session.commit()
-
-            # Create access token with identity as string
-            access_token = create_access_token(identity=str(user.id))
-
-            return jsonify({
-                'message': 'Login successful',
-                'access_token': access_token,
-                'user': user.to_dict(include_sensitive=True)
-            }), 200
-        else:
+        if not password_valid:
             return jsonify({'error': 'Invalid credentials'}), 401
 
+        if needs_update:
+            user.password_hash = generate_password_hash(data['password'])
+        user.last_login = datetime.utcnow()
+        db.session.commit()
+
+        access_token = create_access_token(identity=str(user.id))
+        return jsonify({
+            'message': 'Login successful',
+            'access_token': access_token,
+            'user': user.to_dict(include_sensitive=True)
+        }), 200
+
     except Exception as e:
-        print(f"Login error: {str(e)}")
         return jsonify({'error': str(e)}), 500
+
+
+@auth_bp.route('/alumni-list', methods=['GET'])
+@jwt_required()
+def alumni_list():
+    current_id = get_jwt_identity()
+    users = User.query.filter(User.is_active.is_(True), User.id != current_id).all()
+    return jsonify([
+        {'id': u.id, 'first_name': u.first_name, 'last_name': u.last_name}
+        for u in users
+    ]), 200
 
 
 @auth_bp.route('/profile', methods=['GET'])
 @jwt_required()
 def get_profile():
     try:
-        current_user_id = get_jwt_identity()
-        user = User.query.get(current_user_id)
+        uid = get_jwt_identity()
+        user = User.query.get(uid)
         if not user:
             return jsonify({'error': 'User not found'}), 404
         return jsonify({'user': user.to_dict(include_sensitive=True)}), 200
-
     except Exception as e:
         return jsonify({'error': str(e)}), 500
 
@@ -198,19 +176,19 @@ def get_profile():
 @jwt_required()
 def update_profile():
     try:
-        current_user_id = get_jwt_identity()
-        user = User.query.get(current_user_id)
+        uid = get_jwt_identity()
+        user = User.query.get(uid)
         if not user:
             return jsonify({'error': 'User not found'}), 404
 
         data = request.get_json()
-        # Update allowed fields
-        updatable_fields = [
-            'first_name', 'last_name', 'phone', 'bio', 'current_company',
-            'current_position', 'industry', 'experience_years', 'skills',
-            'linkedin_url', 'city', 'state', 'country'
+        allowed = [
+            'first_name', 'last_name', 'phone', 'bio',
+            'current_company', 'current_position', 'industry',
+            'experience_years', 'skills', 'linkedin_url',
+            'city', 'state', 'country'
         ]
-        for field in updatable_fields:
+        for field in allowed:
             if field in data:
                 setattr(user, field, data[field])
 
@@ -229,29 +207,27 @@ def update_profile():
 @jwt_required()
 def change_password():
     try:
-        current_user_id = get_jwt_identity()
-        user = User.query.get(current_user_id)
+        uid = get_jwt_identity()
+        user = User.query.get(uid)
         if not user:
             return jsonify({'error': 'User not found'}), 404
 
         data = request.get_json()
-        if not all(key in data for key in ['current_password', 'new_password']):
-            return jsonify({'error': 'Current password and new password are required'}), 400
+        if not data.get('current_password') or not data.get('new_password'):
+            return jsonify({'error': 'Current and new passwords are required'}), 400
 
-        # Check current password with legacy support
-        password_valid = False
-        if user.password_hash and check_password_hash(user.password_hash, data['current_password']):
-            password_valid = True
-        elif user.password_hash and check_legacy_password(user.password_hash, data['current_password']):
-            password_valid = True
+        valid = False
+        if check_password_hash(user.password_hash, data['current_password']):
+            valid = True
+        elif check_legacy_password(user.password_hash, data['current_password']):
+            valid = True
 
-        if not password_valid:
+        if not valid:
             return jsonify({'error': 'Current password is incorrect'}), 400
 
-        # Validate new password
-        is_valid, message = validate_password(data['new_password'])
+        is_valid, msg = validate_password(data['new_password'])
         if not is_valid:
-            return jsonify({'error': message}), 400
+            return jsonify({'error': msg}), 400
 
         user.set_password(data['new_password'])
         db.session.commit()
@@ -262,7 +238,7 @@ def change_password():
         return jsonify({'error': str(e)}), 500
 
 
-# Debug endpoint (remove in production)
+# Debug endpoint—remove in production
 @auth_bp.route('/debug-user/<email>')
 def debug_user(email):
     try:
@@ -273,9 +249,8 @@ def debug_user(email):
                 'id': user.id,
                 'email': user.email,
                 'is_active': user.is_active,
-                'password_hash_length': len(user.password_hash) if user.password_hash else 0,
-                'password_hash_starts_with': user.password_hash[:20] if user.password_hash else None
-            })
-        return jsonify({'found': False})
+                'hash_len': len(user.password_hash) if user.password_hash else 0
+            }), 200
+        return jsonify({'found': False}), 404
     except Exception as e:
-        return jsonify({'error': str(e)})
+        return jsonify({'error': str(e)}), 500
