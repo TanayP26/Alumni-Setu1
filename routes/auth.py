@@ -7,13 +7,27 @@ Created on Thu Sep 11 17:02:00 2025
 
 from flask import Blueprint, request, jsonify
 from flask_jwt_extended import create_access_token, jwt_required, get_jwt_identity
-from werkzeug.security import check_password_hash
+from werkzeug.security import generate_password_hash, check_password_hash
 from extensions import db
 from models import User, UserRole
 from datetime import datetime
 import re
+import hashlib
 
 auth_bp = Blueprint('auth', __name__)
+from werkzeug.security import generate_password_hash, check_password_hash
+
+class User(db.Model):
+    # ... other fields ...
+    password_hash = db.Column(db.String(255), nullable=False)
+    
+    def set_password(self, password):
+        """Set password using secure Werkzeug hashing"""
+        self.password_hash = generate_password_hash(password)
+    
+    def check_password(self, password):
+        """Check password - this method is now handled in auth.py for legacy support"""
+        return check_password_hash(self.password_hash, password)
 
 
 def validate_email(email):
@@ -32,6 +46,34 @@ def validate_password(password):
     if not re.search(r'\d', password):
         return False, "Password must contain at least one number"
     return True, "Valid password"
+
+
+def check_legacy_password(stored_hash, password):
+    """Check if password matches legacy format and return True if it does"""
+    try:
+        # Try common legacy formats
+        
+        # 1. Plain text (very insecure, but might exist)
+        if stored_hash == password:
+            return True
+            
+        # 2. MD5 hash
+        if stored_hash == hashlib.md5(password.encode()).hexdigest():
+            return True
+            
+        # 3. SHA1 hash  
+        if stored_hash == hashlib.sha1(password.encode()).hexdigest():
+            return True
+            
+        # 4. SHA256 hash
+        if stored_hash == hashlib.sha256(password.encode()).hexdigest():
+            return True
+            
+        # Add other legacy formats as needed
+        return False
+        
+    except Exception:
+        return False
 
 
 @auth_bp.route('/register', methods=['POST'])
@@ -109,7 +151,28 @@ def login():
 
         user = User.query.filter_by(email=data['email'].lower()).first()
 
-        if user and user.check_password(data['password']) and user.is_active:
+        if not user or not user.is_active:
+            return jsonify({'error': 'Invalid credentials'}), 401
+
+        # Check password with legacy support
+        password_valid = False
+        needs_hash_update = False
+
+        # Try modern Werkzeug format first
+        if user.password_hash and check_password_hash(user.password_hash, data['password']):
+            password_valid = True
+        
+        # If modern format fails, try legacy formats
+        elif user.password_hash and check_legacy_password(user.password_hash, data['password']):
+            password_valid = True
+            needs_hash_update = True
+
+        if password_valid:
+            # Update to modern hash format if using legacy
+            if needs_hash_update:
+                user.password_hash = generate_password_hash(data['password'])
+                print(f"Updated legacy password for user {user.email}")
+
             # Update last login
             user.last_login = datetime.utcnow()
             db.session.commit()
@@ -126,6 +189,7 @@ def login():
             return jsonify({'error': 'Invalid credentials'}), 401
 
     except Exception as e:
+        print(f"Login error: {str(e)}")
         return jsonify({'error': str(e)}), 500
 
 
@@ -187,7 +251,14 @@ def change_password():
         if not all(key in data for key in ['current_password', 'new_password']):
             return jsonify({'error': 'Current password and new password are required'}), 400
 
-        if not user.check_password(data['current_password']):
+        # Check current password with legacy support
+        password_valid = False
+        if user.password_hash and check_password_hash(user.password_hash, data['current_password']):
+            password_valid = True
+        elif user.password_hash and check_legacy_password(user.password_hash, data['current_password']):
+            password_valid = True
+
+        if not password_valid:
             return jsonify({'error': 'Current password is incorrect'}), 400
 
         # Validate new password
@@ -202,3 +273,22 @@ def change_password():
     except Exception as e:
         db.session.rollback()
         return jsonify({'error': str(e)}), 500
+
+
+# Debug endpoint (remove in production)
+@auth_bp.route('/debug-user/<email>')
+def debug_user(email):
+    try:
+        user = User.query.filter_by(email=email.lower()).first()
+        if user:
+            return jsonify({
+                'found': True,
+                'id': user.id,
+                'email': user.email,
+                'is_active': user.is_active,
+                'password_hash_length': len(user.password_hash) if user.password_hash else 0,
+                'password_hash_starts_with': user.password_hash[:20] if user.password_hash else None
+            })
+        return jsonify({'found': False})
+    except Exception as e:
+        return jsonify({'error': str(e)})
