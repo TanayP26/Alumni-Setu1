@@ -5,23 +5,14 @@ Created on Thu Sep 11 16:57:52 2025
 """
 import os
 from flask import Flask, render_template
-from flask_sqlalchemy import SQLAlchemy
-from flask_jwt_extended import JWTManager
 from flask_cors import CORS
-from flask_mail import Mail
-from flask_migrate import Migrate
-from flask_socketio import SocketIO
 from dotenv import load_dotenv
 from datetime import timedelta
 
-load_dotenv()
+# Import the already instantiated extensions
+from extensions import db, jwt, mail, migrate, socketio
 
-# Initialize extensions
-db = SQLAlchemy()
-jwt = JWTManager()
-mail = Mail()
-migrate = Migrate()
-socketio = SocketIO()
+load_dotenv()
 
 # Import blueprints
 from routes.auth import auth_bp
@@ -57,7 +48,7 @@ def create_app():
     app.config['MAX_CONTENT_LENGTH'] = 16 * 1024 * 1024
     app.config['UPLOAD_FOLDER'] = os.path.join(basedir, 'uploads')
 
-    # Initialize extensions
+    # Initialize extensions with the app instance
     db.init_app(app)
     jwt.init_app(app)
     mail.init_app(app)
@@ -68,7 +59,7 @@ def create_app():
     # Ensure upload folder exists
     os.makedirs(app.config['UPLOAD_FOLDER'], exist_ok=True)
 
-    # Create tables
+    # Create tables within app context
     with app.app_context():
         db.create_all()
 
@@ -110,11 +101,11 @@ def create_app():
     def mentorship_page():
         return render_template('mentorship.html')
 
-    @app.route('/mentorship/find-mentor')
+    @app.route('/mentorship/find')
     def find_mentor_page():
         return render_template('find_mentor.html')
 
-    @app.route('/mentorship/become-mentor')
+    @app.route('/mentorship/become')
     def become_mentor_page():
         return render_template('become_mentor.html')
 
@@ -126,7 +117,5 @@ def create_app():
 
 
 if __name__ == "__main__":
-    # Run with socketio, to enable real-time events
+    # Run with socketio to enable real-time functionality
     socketio.run(create_app(), host='0.0.0.0', port=int(os.environ.get("PORT", 5000)))
-
-
