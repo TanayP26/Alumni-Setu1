@@ -48,7 +48,6 @@
   <!-- Main Content -->
   <main class="container mx-auto px-4 lg:px-8 py-16">
     <div class="max-w-6xl mx-auto grid grid-cols-1 lg:grid-cols-3 gap-8">
-      
       <!-- Sidebar -->
       <div>
         <div class="bg-white rounded-xl p-6 shadow-lg border border-slate-100 mb-6">
@@ -128,7 +127,6 @@
     const socket = io({ auth: { token: localStorage.getItem('token') } });
     let currentView = 'inbox';
     let currentMsgId = null;
-
     function showToast(message, type = 'success') {
       const toast = document.getElementById('toast');
       toast.textContent = message;
@@ -137,13 +135,11 @@
         toast.className = toast.className.replace('opacity-100', 'opacity-0');
       }, 3000);
     }
-
     socket.on('connect_error', () => showToast('Socket connection error', 'error'));
     socket.on('new_message', () => {
       if (currentView === 'inbox') loadInbox();
       updateUnread();
     });
-
     async function fetchJSON(url, options = {}) {
       options.headers = {
         ...(options.headers || {}),
@@ -153,26 +149,22 @@
       if (!response.ok) throw await response.json();
       return response.json();
     }
-
     async function loadInbox() {
       currentView = 'inbox';
       document.getElementById('message-view').classList.add('hidden');
       const data = await fetchJSON('/api/messaging/inbox');
       renderMessageList(data.messages);
     }
-
     async function loadSent() {
       currentView = 'sent';
       document.getElementById('message-view').classList.add('hidden');
       const data = await fetchJSON('/api/messaging/sent');
       renderMessageList(data.messages);
     }
-
     function renderMessageList(messages) {
       const container = document.getElementById('list-container');
       container.innerHTML = '';
       document.getElementById('list-title').textContent = currentView === 'inbox' ? 'Inbox' : 'Sent';
-
       messages.forEach(msg => {
         const msgDiv = document.createElement('div');
         msgDiv.className = 'p-4 border-b border-gray-200 cursor-pointer hover:bg-indigo-50';
@@ -188,7 +180,6 @@
         container.appendChild(msgDiv);
       });
     }
-
     async function viewMessage(messageId) {
       const data = await fetchJSON(`/api/messaging/${messageId}`);
       currentMsgId = messageId;
@@ -209,12 +200,10 @@
       `;
       view.classList.remove('hidden');
       document.getElementById('message-list').classList.add('hidden');
-
       document.getElementById('back-btn').onclick = () => {
         view.classList.add('hidden');
         document.getElementById('message-list').classList.remove('hidden');
       };
-
       document.getElementById('delete-btn').onclick = async () => {
         await fetchJSON(`/api/messaging/${currentMsgId}`, { method: 'DELETE' });
         showToast('Message deleted');
@@ -223,7 +212,6 @@
         updateUnread();
       };
     }
-
     async function updateUnread() {
       const data = await fetchJSON('/api/messaging/unread-count');
       const badge = document.getElementById('unread-badge');
@@ -234,7 +222,6 @@
         badge.style.display = 'none';
       }
     }
-
     async function loadUsers() {
       const data = await fetchJSON('/api/auth/alumni-list');
       const select = document.getElementById('recipient-select');
@@ -246,7 +233,6 @@
         select.appendChild(option);
       });
     }
-
     document.getElementById('inbox-btn').onclick = loadInbox;
     document.getElementById('sent-btn').onclick = loadSent;
     document.getElementById('compose-btn').onclick = () => {
@@ -261,24 +247,19 @@
       const recipientId = document.getElementById('recipient-select').value;
       const subject = document.getElementById('subject-input').value;
       const content = document.getElementById('content-input').value;
-
       if (!recipientId) {
         showToast('Please select a recipient', 'error');
         return;
       }
-
       await fetchJSON('/api/messaging/send', {
         method: 'POST',
         body: JSON.stringify({ recipient_id: recipientId, subject, content }),
       });
-
       showToast('Message sent');
       document.getElementById('compose-modal').classList.add('hidden');
-
       currentView === 'sent' ? loadSent() : loadInbox();
       updateUnread();
     };
-
     window.onload = () => {
       loadInbox();
       updateUnread();
