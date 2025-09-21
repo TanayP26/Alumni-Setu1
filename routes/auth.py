@@ -15,19 +15,6 @@ import re
 import hashlib
 
 auth_bp = Blueprint('auth', __name__)
-from werkzeug.security import generate_password_hash, check_password_hash
-
-class User(db.Model):
-    # ... other fields ...
-    password_hash = db.Column(db.String(255), nullable=False)
-    
-    def set_password(self, password):
-        """Set password using secure Werkzeug hashing"""
-        self.password_hash = generate_password_hash(password)
-    
-    def check_password(self, password):
-        """Check password - this method is now handled in auth.py for legacy support"""
-        return check_password_hash(self.password_hash, password)
 
 
 def validate_email(email):
