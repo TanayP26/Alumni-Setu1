@@ -28,7 +28,6 @@ from routes.auth import auth_bp
 from routes.alumni import alumni_bp
 from routes.events import events_bp
 from routes.jobs import jobs_bp
-from routes.messages import messages_bp
 from routes.admin import admin_bp
 from routes.messaging import messaging_bp
 
@@ -130,3 +129,4 @@ def create_app():
 if __name__ == "__main__":
     # Run with socketio, to enable real-time events
     socketio.run(create_app(), host='0.0.0.0', port=int(os.environ.get("PORT", 5000)))
+
