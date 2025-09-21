@@ -36,6 +36,36 @@ event_attendees = db.Table(
     db.Column('event_id', db.Integer, db.ForeignKey('events.id'), primary_key=True),
     db.Column('registered_at', db.DateTime, default=datetime.utcnow)
 )
+# Add this to your existing models.py file
+
+class Message(db.Model):
+    __tablename__ = 'messages'
+    
+    id = db.Column(db.Integer, primary_key=True)
+    sender_id = db.Column(db.Integer, db.ForeignKey('users.id'), nullable=False)
+    recipient_id = db.Column(db.Integer, db.ForeignKey('users.id'), nullable=False)
+    subject = db.Column(db.String(200), nullable=False)
+    content = db.Column(db.Text, nullable=False)
+    timestamp = db.Column(db.DateTime, default=datetime.utcnow, nullable=False)
+    is_read = db.Column(db.Boolean, default=False, nullable=False)
+    
+    # Relationships
+    sender = db.relationship('User', foreign_keys=[sender_id], backref='sent_messages')
+    recipient = db.relationship('User', foreign_keys=[recipient_id], backref='received_messages')
+    
+    def to_dict(self):
+        return {
+            'id': self.id,
+            'sender_id': self.sender_id,
+            'recipient_id': self.recipient_id,
+            'sender_name': f"{self.sender.first_name} {self.sender.last_name}",
+            'recipient_name': f"{self.recipient.first_name} {self.recipient.last_name}",
+            'subject': self.subject,
+            'content': self.content,
+            'timestamp': self.timestamp.isoformat(),
+            'is_read': self.is_read
+        }
+
 
 class User(db.Model):
     __tablename__ = 'users'
@@ -246,4 +276,5 @@ class NewsletterSubscriber(db.Model):
             'is_active': self.is_active,
             'subscribed_at': self.subscribed_at.isoformat() if self.subscribed_at else None
         }
+
 
