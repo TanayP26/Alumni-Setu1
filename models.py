@@ -1,15 +1,12 @@
 # -*- coding: utf-8 -*-
 """
 Created on Thu Sep 11 17:00:11 2025
-
 @author: Admin
 """
 from extensions import db
 from datetime import datetime
 from werkzeug.security import generate_password_hash, check_password_hash
 from enum import Enum
-
-
 
 # Enum definitions
 class UserRole(Enum):
@@ -36,36 +33,6 @@ event_attendees = db.Table(
     db.Column('event_id', db.Integer, db.ForeignKey('events.id'), primary_key=True),
     db.Column('registered_at', db.DateTime, default=datetime.utcnow)
 )
-# Add this to your existing models.py file
-
-class Message(db.Model):
-    __tablename__ = 'messages'
-    
-    id = db.Column(db.Integer, primary_key=True)
-    sender_id = db.Column(db.Integer, db.ForeignKey('users.id'), nullable=False)
-    recipient_id = db.Column(db.Integer, db.ForeignKey('users.id'), nullable=False)
-    subject = db.Column(db.String(200), nullable=False)
-    content = db.Column(db.Text, nullable=False)
-    timestamp = db.Column(db.DateTime, default=datetime.utcnow, nullable=False)
-    is_read = db.Column(db.Boolean, default=False, nullable=False)
-    
-    # Relationships
-    sender = db.relationship('User', foreign_keys=[sender_id], backref='sent_messages')
-    recipient = db.relationship('User', foreign_keys=[recipient_id], backref='received_messages')
-    
-    def to_dict(self):
-        return {
-            'id': self.id,
-            'sender_id': self.sender_id,
-            'recipient_id': self.recipient_id,
-            'sender_name': f"{self.sender.first_name} {self.sender.last_name}",
-            'recipient_name': f"{self.recipient.first_name} {self.recipient.last_name}",
-            'subject': self.subject,
-            'content': self.content,
-            'timestamp': self.timestamp.isoformat(),
-            'is_read': self.is_read
-        }
-
 
 class User(db.Model):
     __tablename__ = 'users'
@@ -77,7 +44,6 @@ class User(db.Model):
     is_verified = db.Column(db.Boolean, default=False)
     created_at = db.Column(db.DateTime, default=datetime.utcnow)
     last_login = db.Column(db.DateTime)
-
     first_name = db.Column(db.String(50), nullable=False)
     last_name = db.Column(db.String(50), nullable=False)
     phone = db.Column(db.String(15))
@@ -91,14 +57,14 @@ class User(db.Model):
     current_position = db.Column(db.String(100))
     industry = db.Column(db.String(100))
     experience_years = db.Column(db.Integer)
-    skills = db.Column(db.Text)  # JSON string
+    skills = db.Column(db.Text)  # JSON string or comma-separated
     linkedin_url = db.Column(db.String(255))
     city = db.Column(db.String(100))
     state = db.Column(db.String(100))
     country = db.Column(db.String(100))
 
     sent_messages = db.relationship('Message', foreign_keys='Message.sender_id', backref='sender', lazy='dynamic')
-    received_messages = db.relationship('Message', foreign_keys='Message.receiver_id', backref='receiver', lazy='dynamic')
+    received_messages = db.relationship('Message', foreign_keys='Message.recipient_id', backref='recipient', lazy='dynamic')
     created_events = db.relationship('Event', backref='creator', lazy='dynamic')
     registered_events = db.relationship('Event', secondary=event_attendees, backref='attendees')
     posted_jobs = db.relationship('Job', backref='poster', lazy='dynamic')
@@ -138,11 +104,7 @@ class User(db.Model):
         }
         if include_sensitive:
             data['email'] = self.email
-            # Add other sensitive fields if needed, but never include password hash
-        
         return data
-    pass
-
 
 class Event(db.Model):
     __tablename__ = 'events'
@@ -214,27 +176,6 @@ class Job(db.Model):
             'poster_id': self.poster_id,
         }
 
-class Message(db.Model):
-    __tablename__ = 'messages'
-    id = db.Column(db.Integer, primary_key=True)
-    subject = db.Column(db.String(200))
-    content = db.Column(db.Text, nullable=False)
-    is_read = db.Column(db.Boolean, default=False)
-    created_at = db.Column(db.DateTime, default=datetime.utcnow)
-    sender_id = db.Column(db.Integer, db.ForeignKey('users.id'), nullable=False)
-    receiver_id = db.Column(db.Integer, db.ForeignKey('users.id'), nullable=False)
-
-    def to_dict(self):
-        return {
-            'id': self.id,
-            'subject': self.subject,
-            'content': self.content,
-            'is_read': self.is_read,
-            'created_at': self.created_at.isoformat() if self.created_at else None,
-            'sender_id': self.sender_id,
-            'receiver_id': self.receiver_id,
-        }
-
 class Donation(db.Model):
     __tablename__ = 'donations'
     id = db.Column(db.Integer, primary_key=True)
@@ -276,5 +217,3 @@ class NewsletterSubscriber(db.Model):
             'is_active': self.is_active,
             'subscribed_at': self.subscribed_at.isoformat() if self.subscribed_at else None
         }
-
-
