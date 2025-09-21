@@ -31,6 +31,11 @@ jobs:
 
     - name: Run database migrations
       run: flask db upgrade
+    - name: Run database migrations
+      run: |
+        flask db migrate -m "Add messaging model" || echo "migration script already exists"
+        flask db upgrade
+
 
     - name: Start Application
       run: gunicorn "app:create_app()" --bind 0.0.0.0:5000
