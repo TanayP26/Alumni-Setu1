@@ -5,6 +5,7 @@ Flask-CORS==4.0.1
 Flask-Mail==0.9.1
 Flask-Migrate==4.0.4
 python-dotenv==1.0.0
-Flask-SocketIO==<version>
+Flask-SocketIO==5.3.2
 gunicorn==21.2.0
+
 
