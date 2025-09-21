@@ -3,7 +3,6 @@
 Created on Thu Sep 11 16:57:52 2025
 @author: Admin
 """
-
 import os
 from flask import Flask, render_template
 from flask_sqlalchemy import SQLAlchemy
@@ -12,8 +11,8 @@ from flask_cors import CORS
 from flask_mail import Mail
 from flask_migrate import Migrate
 from flask_socketio import SocketIO
-from datetime import timedelta
 from dotenv import load_dotenv
+from datetime import timedelta
 
 load_dotenv()
 
@@ -33,6 +32,7 @@ from routes.messages import messages_bp
 from routes.admin import admin_bp
 from routes.messaging import messaging_bp
 
+
 def create_app():
     app = Flask(__name__)
     basedir = os.path.abspath(os.path.dirname(__file__))
@@ -45,6 +45,7 @@ def create_app():
         app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///' + os.path.join(basedir, rel)
     else:
         app.config['SQLALCHEMY_DATABASE_URI'] = db_url
+
     app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
     app.config['JWT_SECRET_KEY'] = os.getenv('JWT_SECRET_KEY', 'jwt-secret-string')
     app.config['JWT_ACCESS_TOKEN_EXPIRES'] = timedelta(hours=24)
@@ -65,7 +66,7 @@ def create_app():
     socketio.init_app(app, cors_allowed_origins="*")
     CORS(app, resources={r"/api/*": {"origins": "*"}})
 
-    # Ensure upload folder
+    # Ensure upload folder exists
     os.makedirs(app.config['UPLOAD_FOLDER'], exist_ok=True)
 
     # Create tables
@@ -106,7 +107,7 @@ def create_app():
     def profile_page():
         return render_template('profile.html')
 
-    # Mentorship
+    # Mentorship routes
     @app.route('/mentorship')
     def mentorship_page():
         return render_template('mentorship.html')
@@ -120,12 +121,12 @@ def create_app():
         return render_template('become_mentor.html')
 
     @app.route('/mentorship/matches')
-    def mentor_matches_page():
+    def mentor_matches():
         return render_template('mentor_matches.html')
 
     return app
 
-app = create_app()
 
-if __name__ == '__main__':
-    socketio.run(app, host='0.0.0.0', port=int(os.environ.get("PORT", 5000)))
+if __name__ == "__main__":
+    # Run with socketio, to enable real-time events
+    socketio.run(create_app(), host='0.0.0.0', port=int(os.environ.get("PORT", 5000)))
