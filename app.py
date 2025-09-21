@@ -1,10 +1,8 @@
 # -*- coding: utf-8 -*-
 """
 Created on Thu Sep 11 16:57:52 2025
-
 @author: Admin
 """
-# app.py
 
 import os
 from flask import Flask, render_template
@@ -15,18 +13,23 @@ from flask_mail import Mail
 from flask_migrate import Migrate
 from datetime import timedelta
 from dotenv import load_dotenv
-from routes.auth import auth_bp
-from routes.alumni import alumni_bp
-from routes.messaging import messaging_bp
-...
 
 load_dotenv()
 
+# Initialize extensions
 db = SQLAlchemy()
 jwt = JWTManager()
 mail = Mail()
 migrate = Migrate()
-from extensions import db, jwt, mail, migrate
+
+# Import blueprints
+from routes.auth import auth_bp
+from routes.alumni import alumni_bp
+from routes.events import events_bp
+from routes.jobs import jobs_bp
+from routes.messages import messages_bp
+from routes.admin import admin_bp
+from routes.messaging import messaging_bp
 
 def create_app():
     app = Flask(__name__)
@@ -51,7 +54,6 @@ def create_app():
     app.config['MAIL_DEFAULT_SENDER'] = os.getenv('MAIL_DEFAULT_SENDER')
     app.config['MAX_CONTENT_LENGTH'] = 16 * 1024 * 1024
     app.config['UPLOAD_FOLDER'] = os.path.join(basedir, 'uploads')
-    
 
     # Initialize extensions
     db.init_app(app)
@@ -68,14 +70,6 @@ def create_app():
         db.create_all()
 
     # Register blueprints
-    from routes.auth import auth_bp
-    from routes.alumni import alumni_bp
-    from routes.events import events_bp
-    from routes.jobs import jobs_bp
-    from routes.messages import messages_bp
-    from routes.admin import admin_bp
-    from routes.auth import auth_bp
-    
     app.register_blueprint(auth_bp, url_prefix='/api/auth')
     app.register_blueprint(alumni_bp, url_prefix='/api/alumni')
     app.register_blueprint(events_bp, url_prefix='/api/events')
@@ -126,22 +120,9 @@ def create_app():
     def mentor_matches_page():
         return render_template('mentor_matches.html')
 
-
-    @app.route('/messaging')
-    def messaging():
-        return render_template('messaging.html')
-    
-    
-
-
     return app
+
 app = create_app()
 
 if __name__ == '__main__':
     app.run(host='0.0.0.0', port=int(os.environ.get("PORT", 5000)))
-
-
-
-
-
-
