@@ -28,10 +28,7 @@ def create_app():
     basedir = os.path.abspath(os.path.dirname(__file__))
     from flask import send_file
 
-    @app.route('/download-db')
-    def download_db():
-        return send_file('alumni_management.db', as_attachment=True)
-
+    
 
     # Configuration
     app.config['SECRET_KEY'] = os.getenv('SECRET_KEY', 'your-secret-key-here')
@@ -77,11 +74,6 @@ def create_app():
     app.register_blueprint(admin_bp, url_prefix='/api/admin')
     app.register_blueprint(messaging_bp, url_prefix='/api/messaging')
 
-    @app.route('/debug/users')
-def debug_users():
-    users = User.query.all()
-    user_list = [u.to_dict(include_sensitive=True) for u in users]
-    return jsonify(user_list)
 
     # Frontend routes
     @app.route('/')
@@ -131,6 +123,7 @@ def debug_users():
 if __name__ == "__main__":
     # Run with socketio to enable real-time functionality
     socketio.run(create_app(), host='0.0.0.0', port=int(os.environ.get("PORT", 5000)))
+
 
 
 
