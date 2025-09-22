@@ -1,55 +1,117 @@
-{% extends "base.html" %}
+<!DOCTYPE html>
+<html lang="en" class="scroll-smooth">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1"/>
+  <title>Events — Alumni Setu</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}"/>
+</head>
+<body class="bg-slate-50 text-slate-800">
+  <!-- Header -->
+  <header class="sticky top-0 bg-white/80 backdrop-blur-md z-40 border-b border-slate-200 mb-8">
+    <nav class="container mx-auto px-4 lg:px-8 py-4 flex justify-between items-center">
+      <a href="/" class="flex items-center space-x-3">
+        <img src="{{ url_for('static', filename='1.png') }}" alt="Alumni Setu Logo" width="60" class="rounded-full"/>
+        <span class="font-bold text-2xl text-slate-800 font-display">Alumni Setu</span>
+      </a>
+      <div class="hidden md:flex items-center space-x-6">
+        <a href="/" class="text-slate-600 hover:text-indigo-500 transition">Home</a>
+        <a href="/alumni" class="text-slate-600 hover:text-indigo-500 transition">Alumni Directory</a>
+        <a href="/jobs" class="text-slate-600 hover:text-indigo-500 transition">Job Board</a>
+        <a href="/events" class="text-indigo-600 font-semibold">Events</a>
+        <a href="/messaging" class="text-slate-600 hover:text-indigo-500 transition">Messages</a>
+        <a href="/mentorship" class="text-slate-600 hover:text-indigo-500 transition">Mentorship</a>
+      </div>
+    </nav>
+  </header>
 
-{% block title %}Events - Alumni Setu{% endblock %}
-
-{% block content %}
-<div class="container mx-auto px-4 lg:px-8 py-16">
-    <!-- Header Section -->
-    <div class="text-center mb-12">
-        <h1 class="text-4xl md:text-5xl font-bold text-slate-900 mb-4">
-            <span class="gradient-text">Events</span>
-        </h1>
-        <p class="text-lg text-slate-600 max-w-2xl mx-auto">
-            Stay connected through alumni gatherings, workshops, and networking events
-        </p>
-    </div>
-
-    <!-- Event Tabs -->
-    <div class="flex justify-center mb-8">
-        <div class="bg-slate-100 p-1 rounded-lg">
-            <button id="upcoming-tab" class="tab-btn active px-6 py-2 rounded-md font-medium transition">Upcoming</button>
-            <button id="past-tab" class="tab-btn px-6 py-2 rounded-md font-medium transition">Past Events</button>
-            <button id="my-events-tab" class="tab-btn px-6 py-2 rounded-md font-medium transition">My Events</button>
-        </div>
-    </div>
+  <!-- Event Banner -->
+  <section class="container mx-auto px-4 lg:px-8 py-6">
+    <h1 class="text-3xl font-bold text-indigo-800 mb-2">Upcoming Events</h1>
+    <p class="text-slate-600 mb-8">Stay up-to-date with alumni meetups, webinars, workshops, and college festivities!</p>
 
     <!-- Events Grid -->
-    <div id="events-grid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-8">
-        <!-- Events will be loaded here dynamically -->
-    </div>
+    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+      <!-- Dummy Event Card 1 -->
+      <div class="bg-white rounded-xl shadow-lg border border-slate-100">
+        <img src="{{ url_for('static', filename='event1.jpg') }}" alt="Alumni Hackathon 2025" class="rounded-t-xl w-full h-40 object-cover"/>
+        <div class="p-6">
+          <h2 class="text-xl font-bold text-indigo-700 mb-2">Alumni Hackathon 2025</h2>
+          <p class="text-slate-600 mb-3">Compete with top alumni and students in our annual coding showdown. Cash prizes & networking with top tech alumni!</p>
+          <div class="flex items-center text-sm text-slate-500 mb-2">
+            <span class="mr-3"><i class="fa fa-calendar"></i> Oct 22, 2025</span>
+            <span><i class="fa fa-map-marker"></i> Main Auditorium</span>
+          </div>
+          <span class="inline-block bg-indigo-100 text-indigo-800 text-xs px-3 py-1 rounded-full mb-2">UPCOMING</span>
+          <a href="#" class="block w-full text-center mt-2 px-4 py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 transition">Register</a>
+        </div>
+      </div>
 
-    <!-- Loading State -->
-    <div id="loading-events" class="text-center py-8 hidden">
-        <div class="inline-block animate-spin rounded-full h-8 w-8 border-b-2 border-indigo-600"></div>
-        <p class="mt-2 text-slate-600">Loading events...</p>
-    </div>
+      <!-- Dummy Event Card 2 -->
+      <div class="bg-white rounded-xl shadow-lg border border-slate-100">
+        <img src="{{ url_for('static', filename='event2.jpg') }}" alt="Resume Workshop" class="rounded-t-xl w-full h-40 object-cover"/>
+        <div class="p-6">
+          <h2 class="text-xl font-bold text-indigo-700 mb-2">Resume & LinkedIn Workshop</h2>
+          <p class="text-slate-600 mb-3">Join our career coaches and alumni HRs for a masterclass on acing your job applications.</p>
+          <div class="flex items-center text-sm text-slate-500 mb-2">
+            <span class="mr-3"><i class="fa fa-calendar"></i> Nov 02, 2025</span>
+            <span><i class="fa fa-map-marker"></i> Seminar Hall B</span>
+          </div>
+          <span class="inline-block bg-green-100 text-green-800 text-xs px-3 py-1 rounded-full mb-2">REGISTRATIONS OPEN</span>
+          <a href="#" class="block w-full text-center mt-2 px-4 py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 transition">Register</a>
+        </div>
+      </div>
 
-    <!-- No Events State -->
-    <div id="no-events" class="text-center py-12 hidden">
-        <i data-lucide="calendar" class="w-16 h-16 mx-auto text-slate-400 mb-4"></i>
-        <h3 class="text-xl font-semibold text-slate-600 mb-2">No events found</h3>
-        <p class="text-slate-500">Check back later for upcoming events</p>
-    </div>
+      <!-- Dummy Event Card 3 -->
+      <div class="bg-white rounded-xl shadow-lg border border-slate-100">
+        <img src="{{ url_for('static', filename='event3.jpg') }}" alt="Tech Talk" class="rounded-t-xl w-full h-40 object-cover"/>
+        <div class="p-6">
+          <h2 class="text-xl font-bold text-indigo-700 mb-2">Tech Talk: AI for Social Impact</h2>
+          <p class="text-slate-600 mb-3">Hear from alumni working at Google, Microsoft, and social startups about AI’s role in social good.</p>
+          <div class="flex items-center text-sm text-slate-500 mb-2">
+            <span class="mr-3"><i class="fa fa-calendar"></i> Oct 28, 2025</span>
+            <span><i class="fa fa-map-marker"></i> Online (Zoom)</span>
+          </div>
+          <span class="inline-block bg-blue-100 text-blue-800 text-xs px-3 py-1 rounded-full mb-2">VIRTUAL EVENT</span>
+          <a href="#" class="block w-full text-center mt-2 px-4 py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 transition">Join Webinar</a>
+        </div>
+      </div>
 
-    <!-- Create Event Button -->
-    <div class="fixed bottom-6 right-6">
-        <button id="create-event-btn" class="bg-indigo-600 hover:bg-indigo-700 text-white rounded-full p-4 shadow-lg transition-transform hover:scale-110">
-            <i data-lucide="plus" class="w-6 h-6"></i>
-        </button>
-    </div>
-</div>
-{% endblock %}
+      <!-- Dummy Event Card 4 -->
+      <div class="bg-white rounded-xl shadow-lg border border-slate-100">
+        <img src="{{ url_for('static', filename='event4.jpg') }}" alt="Alumni Sports Meet" class="rounded-t-xl w-full h-40 object-cover"/>
+        <div class="p-6">
+          <h2 class="text-xl font-bold text-indigo-700 mb-2">Alumni Sports Meet 2025</h2>
+          <p class="text-slate-600 mb-3">Teams across batches compete in cricket, football, basketball and more. Cheer for your seniors and relive the college days!</p>
+          <div class="flex items-center text-sm text-slate-500 mb-2">
+            <span class="mr-3"><i class="fa fa-calendar"></i> Dec 10, 2025</span>
+            <span><i class="fa fa-map-marker"></i> College Grounds</span>
+          </div>
+          <span class="inline-block bg-orange-100 text-orange-800 text-xs px-3 py-1 rounded-full mb-2">REGISTRATIONS SOON</span>
+          <a href="#" class="block w-full text-center mt-2 px-4 py-2 bg-gray-400 text-white rounded-lg cursor-not-allowed">Coming Soon</a>
+        </div>
+      </div>
 
-{% block scripts %}
-<script src="{{ url_for('static', filename='events.js') }}"></script>
-{% endblock %}
+      <!-- Dummy Event Card 5 -->
+      <div class="bg-white rounded-xl shadow-lg border border-slate-100">
+        <img src="{{ url_for('static', filename='event5.jpg') }}" alt="Research Symposium" class="rounded-t-xl w-full h-40 object-cover"/>
+        <div class="p-6">
+          <h2 class="text-xl font-bold text-indigo-700 mb-2">Annual Research Symposium</h2>
+          <p class="text-slate-600 mb-3">Alumni and faculty present latest innovations, papers, and collaborative projects. Open for all departments.</p>
+          <div class="flex items-center text-sm text-slate-500 mb-2">
+            <span class="mr-3"><i class="fa fa-calendar"></i> Nov 20, 2025</span>
+            <span><i class="fa fa-map-marker"></i> Innovation Lab</span>
+          </div>
+          <span class="inline-block bg-purple-100 text-purple-800 text-xs px-3 py-1 rounded-full mb-2">CALL FOR PAPERS</span>
+          <a href="#" class="block w-full text-center mt-2 px-4 py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 transition">Submit Abstract</a>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <footer class="mt-12 text-center py-6 text-slate-400 text-sm">
+    &copy; 2025 Alumni Setu. All rights reserved.
+  </footer>
+</body>
+</html>
