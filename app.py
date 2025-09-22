@@ -71,6 +71,12 @@ def create_app():
     app.register_blueprint(admin_bp, url_prefix='/api/admin')
     app.register_blueprint(messaging_bp, url_prefix='/api/messaging')
 
+    @app.route('/debug/users')
+def debug_users():
+    users = User.query.all()
+    user_list = [u.to_dict(include_sensitive=True) for u in users]
+    return jsonify(user_list)
+
     # Frontend routes
     @app.route('/')
     def home():
@@ -119,3 +125,4 @@ def create_app():
 if __name__ == "__main__":
     # Run with socketio to enable real-time functionality
     socketio.run(create_app(), host='0.0.0.0', port=int(os.environ.get("PORT", 5000)))
+
