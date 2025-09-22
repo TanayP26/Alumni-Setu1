@@ -26,6 +26,12 @@ from routes.messaging import messaging_bp
 def create_app():
     app = Flask(__name__)
     basedir = os.path.abspath(os.path.dirname(__file__))
+    from flask import send_file
+
+@app.route('/download-db')
+def download_db():
+    return send_file('alumni_management.db', as_attachment=True)
+
 
     # Configuration
     app.config['SECRET_KEY'] = os.getenv('SECRET_KEY', 'your-secret-key-here')
@@ -125,4 +131,5 @@ def debug_users():
 if __name__ == "__main__":
     # Run with socketio to enable real-time functionality
     socketio.run(create_app(), host='0.0.0.0', port=int(os.environ.get("PORT", 5000)))
+
 
